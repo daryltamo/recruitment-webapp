@@ -1,13 +1,24 @@
-FROM node:20
+FROM node:20-alpine as deps
 
 # Set the working directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install only production dependencies
+RUN npm ci --omit=dev
+
+FROM node:20-alpine as runtime
+
+# Set the working directory
+WORKDIR /app
+
+# Set environment variables
+ENV NODE_ENV=production
+
+# Copy only the necessary files from the deps stage
+COPY --from=deps /app/node_modules ./node_modules
 
 # Copy the rest of the application files
 COPY . .
