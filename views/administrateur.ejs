@@ -1,91 +1,42 @@
-<!doctype html>
-<html lang="fr">
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>MT Rec - Administrateur</title>
-    <link rel="stylesheet" href="/stylesheets/accueil.css">
-    
-    <!--
-    <link rel="stylesheet" href="/stylesheets/connexion.css">
-    <link rel="stylesheet" href="/stylesheets/formulaires.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrateur Dashboard</title>
     <link rel="stylesheet" href="/stylesheets/general.css">
-    -->
-
-    <script src="script.js"></script>
 </head>
-
-
-
 <body>
-
     <header>
-        <div class="container">
-            <div class="logo">
-                <img src="/images/mt-logo.png" alt="Logo" class="logo">
-            </div>
-        
-            <nav>
-                <a href="#">Gérer les organisations</a>
-                <a href="#">Gérer les recruteurs</a>
-                <a href="#">Gérer les utilisateurs</a>
-                <a href="/admin/monCompteAdmin">Mon compte</a>
-                <a href="/connexion/disconnectUser" class="deconnexion">Deconnexion</a>
-            </nav>
-        </div>
-        <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+        <h1>Bienvenue sur le tableau de bord Administrateur</h1>
+        <nav>
+            <ul>
+                <li><a href="/admin/gestionOrganisations">Gérer Organisations</a></li>
+                <li><a href="/admin/gestionRecruteurs">Gérer Recruteurs</a></li>
+                <li><a href="/admin/listeDemandesAjoutOrg">Demandes d'Ajout d'Organisation</a></li>
+                <li><a href="/admin/listeDemandesDevenirAdmin">Demandes de Devenir Administrateur</a></li>
+                <li><a href="/logout">Déconnexion</a></li>
+            </ul>
+        </nav>
     </header>
-
-
-    <main class="content">
-        <div>
-            <div class="disposition_horizontale">
-
-                <h2>Bon retour parmis<br>nous (Prénom)</h2>
-
-                <div class="disposition_categorie_bouton">
-                    <img src="/images/utilisateur.png" alt="Utilisateur">
-                    <h3>Gestion des<br>utilisateurs</h3>
-                </div>
-
-                <div class="disposition_categorie_bouton">
-                    <img src="/images/organisation.png" alt="Organisation">
-                    <h3>Gestion des<br>organisations</h3>
-                </div>
-
-                <div class="disposition_categorie_bouton"></div>
-                    <img src="/images/recrutement.png" alt="Recruteur">
-                    <h3>Gestion des<br>recruteurs</h3>
-                </div>
-            </div>  
-        </div>
+    <main>
+        <section>
+            <h2>Statistiques</h2>
+            <p>Nombre total d'organisations: <%= totalOrganisations %></p>
+            <p>Nombre total de recruteurs: <%= totalRecruteurs %></p>
+            <p>Nombre total de demandes en attente: <%= totalDemandes %></p>
+        </section>
+        <section>
+            <h2>Dernières Activités</h2>
+            <ul>
+                <% activites.forEach(function(activite) { %>
+                    <li><%= activite.description %> - <%= activite.date %></li>
+                <% }); %>
+            </ul>
+        </section>
     </main>
-
-
     <footer>
-        <div class="container">
-            <div class="logo">
-                <img src="/images/mt-logo.png" alt="Logo" class="logo">
-            </div>
-
-            <div class="disposition_verticale">
-                
-                <div class="disposition_horizontale">
-                    <a href="#">A propos de nous</a>
-                    <a href="#">Nous contacter</a>
-                </div>
-
-                <div class="copyright">
-                    <p>Copyright - MT Rec 2024©</p>
-                </div>
-
-            </div>
-            
-        </div>
-        <!-- TODO: check footer and header consistency and uniformity accross all pages -->
-    
+        <p>&copy; 2023 Votre Application de Recrutement</p>
     </footer>
-
 </body>
-
 </html>

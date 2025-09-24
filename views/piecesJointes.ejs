@@ -1,74 +1,33 @@
-<!doctype html>
-<html lang="fr">
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>MT Rec - Pieces Jointes</title>
-    <link rel="stylesheet" href="/stylesheets/accueil.css">
-    
-    <!--
-    <link rel="stylesheet" href="/stylesheets/connexion.css">
-    <link rel="stylesheet" href="/stylesheets/formulaires.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attachments</title>
     <link rel="stylesheet" href="/stylesheets/general.css">
-    -->
 </head>
-
 <body>
-
     <header>
-        <div class="container">
-            <div class="logo">
-                <img src="/images/mt-logo.png" alt="Logo" class="logo">
-            </div>
-        
-            <nav>
-                <a href="#">Link 1</a>
-                <a href="#">link 2</a>
-                <a href="#">link 3</a>
-                <a href="#">link 4</a>
-                <a href="/connexion/disconnectUser" class="deconnexion">Deconnexion</a>
-            </nav>
-        </div>
-        <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+        <h1>Attachments</h1>
     </header>
-
-
-    <main class="content">
-        <div>
-            <div>
-
-
-
-            </div>
-        </div>
+    <main>
+        <section>
+            <h2>Uploaded Files</h2>
+            <ul>
+                <% if (attachments && attachments.length > 0) { %>
+                    <% attachments.forEach(function(file) { %>
+                        <li>
+                            <a href="/uploads/<%= file.filename %>"><%= file.originalname %></a>
+                        </li>
+                    <% }); %>
+                <% } else { %>
+                    <li>No attachments found.</li>
+                <% } %>
+            </ul>
+        </section>
     </main>
-
-    
     <footer>
-        <div class="container">
-            <div class="logo">
-                <img src="/images/mt-logo.png" alt="Logo" class="logo">
-            </div>
-
-            <div class="disposition_verticale">
-                
-                <div class="disposition_horizontale">
-                    <a href="#">A propos de nous</a>
-                    <a href="#">Nous contacter</a>
-                </div>
-
-                <div class="copyright">
-                    <p>Copyright - MT Rec 2024©</p>
-                </div>
-
-            </div>
-            
-        </div>
-        <!-- TODO: check footer and header consistency and uniformity accross all pages -->
-    
+        <p>&copy; 2023 Recruitment Web App</p>
     </footer>
-
 </body>
-
 </html>
-

@@ -1,26 +1,29 @@
 {
-  "name": "myapp",
-  "version": "0.0.0",
-  "private": true,
+  "name": "recruitment-webapp",
+  "version": "1.0.0",
+  "description": "A web application for recruitment management.",
+  "main": "app.js",
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node bin/www",
+    "dev": "nodemon bin/www",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "migrate": "bash scripts/migrate.sh",
+    "setup": "bash scripts/setup.sh"
   },
   "dependencies": {
-    "common": "^0.2.5",
-    "connect-flash": "^0.1.1",
-    "cookie-parser": "~1.4.6",
-    "crypto-js": "^4.2.0",
-    "debug": "~4.3.4",
-    "ejs": "^3.1.10",
-    "express": "^4.19.2",
-    "express-session": "^1.17.1",
-    "fs": "^0.0.1-security",
-    "http-errors": "~2.0.0",
-    "morgan": "~1.10.0",
-    "multer": "^1.4.4-lts.1",
-    "mysql": "^2.18.1",
-    "path": "^0.12.7",
-    "sha2": "^1.0.2",
-    "trace": "^3.1.1"
-  }
+    "express": "^4.17.1",
+    "pg": "^8.7.1",
+    "ejs": "^3.1.6",
+    "dotenv": "^10.0.0",
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.5",
+    "express-session": "^1.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "license": "MIT"
 }

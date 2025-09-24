@@ -1,104 +1,34 @@
 <!DOCTYPE html>
-<html lang="fr">
-
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>MT Rec - Erreur <%= error.status %></title>
-    <link rel="stylesheet" href="/stylesheets/accueil.css">
-
-    <!--
-    <link rel="stylesheet" href="/stylesheets/connexion.css">
-    <link rel="stylesheet" href="/stylesheets/formulaires.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Offre</title>
     <link rel="stylesheet" href="/stylesheets/general.css">
-    -->
-    
 </head>
-
 <body>
-
     <header>
-        <div class="container">
-            <div class="logo">
-                <img src="/images/mt-logo.png" alt="Logo" class="logo">
-            </div>
-        
-        </div>
-        <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+        <h1>Detail de l'Offre</h1>
     </header>
-
-
-    <main class="content">
-        <div>
-
-            <div class="disposition_verticale">
-
-                <div class = "image_erreur">
-                    <img src="/images/cute-cat-sleeping-cartoon-icon-illustration-freepik.jpg" alt="Erreur">
-                </div>
-
-            <% if (offre.length > 0) {%>
-                <div class="offreList">
-                    <% offre.forEach(function(champ) { %>
-                    <div class="offre">
-                        <div class="titreoffre">Intitulé de l'offre : <%= champ.intitule %></div>
-                        <div class="descoffre">Description de l'offre : <%= champ.description %></div>
-                        <div class="salaireoffre">Salaire : <%= champ.salaire %></div>
-                        <div class="dateoffre">Date : <%= champ.date_validite.toLocaleDateString('fr-FR') %></div>
-                        <div class="lieuoffre">Lieu : <%= champ.lieu_mission %></div>
-                        <div class="typemetieroffre">Type de métier : <%= champ.type_metier %></div>
-                        <div class="rythmeoffre">Type de métier : <%= champ.rythme %></div>
-                        <div class="docoffre">Nombre de documents nécessaires : <%= champ.num_docs_req %></div>
-                        <a class="lienoffre" href="/candidat/candidatureAUneOffre/<%= champ.num %>" class="postuler">Candidater</a>
-                    </div>
-                    <% }) %>
-
-                </div>
-
-            <% else { %>
-                <div class="message">
-                    <h3>Offre indisponible</h3>
-                </div>
-            <% } %>
-
-            </div>
-
+    <main>
+        <div class="offer-details">
+            <h2><%= offre.titre %></h2>
+            <p><strong>Description:</strong> <%= offre.description %></p>
+            <p><strong>Type:</strong> <%= offre.type %></p>
+            <p><strong>Lieu:</strong> <%= offre.lieu %></p>
+            <p><strong>Date de publication:</strong> <%= offre.datePublication %></p>
+            <p><strong>Compétences requises:</strong> <%= offre.competences.join(', ') %></p>
+        </div>
+        <div class="apply-section">
+            <h3>Postuler</h3>
+            <form action="/candidature" method="POST">
+                <input type="hidden" name="offreId" value="<%= offre._id %>">
+                <button type="submit">Envoyer ma candidature</button>
+            </form>
         </div>
     </main>
-    
-
     <footer>
-        <div class="container">
-            <div class="logo">
-                <img src="/images/mt-logo.png" alt="Logo" class="logo">
-            </div>
-
-            <div class="disposition_verticale">
-                
-                <div class="disposition_horizontale">
-                    <a href="#">A propos de nous</a>
-                    <a href="#">Nous contacter</a>
-                </div>
-
-                <div class="copyright">
-                    <p>Copyright - MT Rec 2024©</p>
-                </div>
-
-            </div>
-            
-        </div>
-        <!-- TODO: check footer and header consistency and uniformity accross all pages -->
-    
+        <p>&copy; 2023 Recrutement Web App</p>
     </footer>
-
-    <script>
-        setTimeout(function() {
-            window.location.href = "/";
-        }, 10000);
-    </script>
-
 </body>
-
-
-
 </html>
-

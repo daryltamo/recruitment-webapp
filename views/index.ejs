@@ -1,39 +1,35 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <title>MT Rec - Acceuil</title>
-    <meta charset="utf-8">
-    <link rel="stylesheet" href="/stylesheets/accueil.css">
-
-    <!--
-    <link rel="stylesheet" href="/stylesheets/connexion.css">
-    <link rel="stylesheet" href="/stylesheets/formulaires.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recruitment Web App</title>
     <link rel="stylesheet" href="/stylesheets/general.css">
-    -->
-
 </head>
-
 <body>
-    <main class="content">
-        <div>
-
-            <div class="disposition_verticale">
-
-                <div class="img_presentation">
-                    <img src="/images/bureau_connexion.png" alt="Bureau" class="image_connexion">
-                </div>
-            
-                <div class="disposition_horizontale">
-                    <button onclick="window.location.href='/connexion'">Connexion</button>
-                    <button onclick="window.location.href='/inscription'">Inscription</button>
-                </div>
-                
-            </div>
-
-        </div>
+    <header>
+        <h1>Welcome to the Recruitment Web App</h1>
+        <nav>
+            <ul>
+                <li><a href="/connexion">Login</a></li>
+                <li><a href="/inscription">Register</a></li>
+                <li><a href="/offreDemploi">Job Offers</a></li>
+                <li><a href="/organisation">Organizations</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h2>Latest Job Offers</h2>
+            <!-- Job offers will be dynamically inserted here -->
+        </section>
+        <section>
+            <h2>About Us</h2>
+            <p>This application helps connect job seekers with employers.</p>
+        </section>
     </main>
-    
+    <footer>
+        <p>&copy; 2023 Recruitment Web App</p>
+    </footer>
 </body>
-
 </html>

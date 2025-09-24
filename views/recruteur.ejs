@@ -1,76 +1,64 @@
-<!doctype html>
-<html lang="fr">
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>MT Rec - Recruteur</title>
-    <link rel="stylesheet" href="/stylesheets/accueil.css">
-    
-    <!--
-    <link rel="stylesheet" href="/stylesheets/connexion.css">
-    <link rel="stylesheet" href="/stylesheets/formulaires.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recruteur Dashboard</title>
     <link rel="stylesheet" href="/stylesheets/general.css">
-    -->
-
-    <script src="script.js"></script>
+    <link rel="stylesheet" href="/stylesheets/accueil.css">
 </head>
-
 <body>
-
     <header>
-        <div class="container">
-            <div class="logo">
-                <img src="/images/mt-logo.png" alt="Logo" class="logo">
-            </div>
-        
-            <nav>
-                <a href="#">Link 1</a>
-                <a href="#">link 2</a>
-                <a href="#">link 3</a>
-                <a href="#">link 4</a>
-                <a href="/connexion/disconnectUser" class="deconnexion">Deconnexion</a>
-            </nav>
-        </div>
-        <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+        <h1>Welcome to the Recruteur Dashboard</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/offres">Manage Job Offers</a></li>
+                <li><a href="/candidatures">View Applications</a></li>
+                <li><a href="/organisation">Manage Organizations</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </nav>
     </header>
-
-    
-    <main class="content">
-        <div>
-            <div class="disposition_horizontale">
-
-                <h2>Bon retour parmis<br>nous (Prénom)</h2>
-
-                
-            </div>  
-        </div>
+    <main>
+        <section>
+            <h2>Your Job Offers</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% jobOffers.forEach(function(offer) { %>
+                        <tr>
+                            <td><%= offer.title %></td>
+                            <td><%= offer.status %></td>
+                            <td>
+                                <a href="/offres/<%= offer.id %>/edit">Edit</a>
+                                <a href="/offres/<%= offer.id %>/delete">Delete</a>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </section>
+        <section>
+            <h2>Recent Applications</h2>
+            <ul>
+                <% applications.forEach(function(application) { %>
+                    <li>
+                        <strong><%= application.candidateName %></strong> applied for <%= application.jobTitle %>
+                        <a href="/candidatures/<%= application.id %>">View Details</a>
+                    </li>
+                <% }); %>
+            </ul>
+        </section>
     </main>
-
-
     <footer>
-        <div class="container">
-            <div class="logo">
-                <img src="/images/mt-logo.png" alt="Logo" class="logo">
-            </div>
-
-            <div class="disposition_verticale">
-                
-                <div class="disposition_horizontale">
-                    <a href="#">A propos de nous</a>
-                    <a href="#">Nous contacter</a>
-                </div>
-
-                <div class="copyright">
-                    <p>Copyright - MT Rec 2024©</p>
-                </div>
-
-            </div>
-            
-        </div>
-        <!-- TODO: check footer and header consistency and uniformity accross all pages -->
-    
+        <p>&copy; 2023 Recruitment Platform</p>
     </footer>
-
 </body>
-
 </html>

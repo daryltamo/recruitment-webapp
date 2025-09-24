@@ -1,89 +1,38 @@
-<!doctype html>
-<html lang="fr">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>MT Rec - Candidature</title>
-
-    <link rel="stylesheet" href="/stylesheets/accueil.css">
-    <!--
-    <link rel="stylesheet" href="/stylesheets/connexion.css">
-    <link rel="stylesheet" href="/stylesheets/formulaires.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidature</title>
     <link rel="stylesheet" href="/stylesheets/general.css">
-    -->
 </head>
-<header>
-  <img src="../images/mt-logo.png" class="logo">
-  <nav>
-    <a href="#">Devenez un recruteur</a>
-    <a href="#">Mes candidatures</a>
-    <a href="#">Profil</a>
-    <a href="#" class="deconnexion">Deconnexion</a>
-  </nav>
-</header>
 <body>
-
     <header>
-        <div class="container">
-            <div class="logo">
-                <img src="/images/mt-logo.png" alt="Logo" class="logo">
-            </div>
-        
-            <nav>
-                <a href="#">Devenez recruteur</a>
-                <a href="#">Mes candidatures</a>
-                <a href="#">Profil</a>
-                <a href="#">link 4</a>
-                <a href="/connexion/disconnectUser" class="deconnexion">Deconnexion</a>
-            </nav>
-        </div>
-        <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+        <h1>Job Application</h1>
     </header>
-
-
-    <main class="content">
-        <div>
-            <div class="formulaire">
-                <div  class="titre-formulaire">
-                    <h3>Candidature pour : <%= titre_offre %></h3>
-                </div>
-                
-                <form action = "/candidature" method="post" id="candidatureForm">
-                    <label for="cv">Curriculum Vitae : </label>
-                
-                    <label for="lm">Lettre de motivation : </label>
-            
-                    <input type="submit" value="Candidater">
-                </form>
+    <main>
+        <form action="/candidature" method="POST" enctype="multipart/form-data">
+            <div>
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
             </div>
-        </div>
+            <div>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div>
+                <label for="resume">Resume:</label>
+                <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" required>
+            </div>
+            <div>
+                <label for="coverLetter">Cover Letter:</label>
+                <textarea id="coverLetter" name="coverLetter" rows="4" required></textarea>
+            </div>
+            <button type="submit">Submit Application</button>
+        </form>
     </main>
-
-
-        <input type="submit" value="Candidater">
-    </form>
-    
     <footer>
-        <div class="container">
-            <div class="logo">
-                <img src="/images/mt-logo.png" alt="Logo" class="logo">
-            </div>
-
-            <div class="disposition_verticale">
-                
-                <div class="disposition_horizontale">
-                    <a href="#">A propos de nous</a>
-                    <a href="#">Nous contacter</a>
-                </div>
-
-                <div class="copyright">
-                    <p>Copyright - MT Rec 2024©</p>
-                </div>
-
-            </div>
-            
-        </div>
-        <!-- TODO: check footer and header consistency and uniformity accross all pages -->
-    
+        <p>&copy; 2023 Recruitment Platform</p>
     </footer>
-
 </body>
 </html>

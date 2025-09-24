@@ -1,137 +1,26 @@
-<!doctype html>
-<html lang="fr">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>MT Rec - Connexion</title>
-    <link rel="stylesheet" href="/stylesheets/accueil.css">
-    <link rel="stylesheet" href="/stylesheets/formulaires.css">
-
-    <!--
-    <link rel="stylesheet" href="/stylesheets/general.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion</title>
     <link rel="stylesheet" href="/stylesheets/connexion.css">
-    -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
 </head>
-
 <body>
-    <header>
-        <div class="container">
-            <div class="logo">
-                <img src="/images/mt-logo.png" alt="Logo" class="logo">
+    <div class="container">
+        <h1>Connexion</h1>
+        <form action="/connexion" method="POST">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
             </div>
-        
-        </div>
-        <!-- TODO: check footer and header consistency and uniformity accross all pages -->
-    </header>
-
-
-    <main class="content">
-        <div>
-        
-            <div class="disposition_horizontale">
-
-                <div class="formulaire">
-
-                    <div class="titre-formulaire">
-                        <h3>Connexion</h3>
-                    </div>
-
-                    <form action="/connexion/connectUser" method="post" id="connexionForm" onsubmit="hashPassword()">
-                        <label for="email">E-mail</label>
-                        <input type="text" id="email" name="email" required>
-
-                        <label for="mdp">Mot de passe</label>
-                        <input type="password"  id="mdp" name="mdp" required>
-                
-                        <input type="submit" value="Se connecter">
-                        <input type="reset" value="Effacer">
-                    </form>
-
-                    <a href="/inscription"> Tu es nouveau ici ? Rejoins-nous en cliquant sur ce lien !</a>
-                    
-                </div>
-
-                <div class="img_presentation">
-                    <img src="/images/clock-concept-illustration-freepik.jpg" alt="ConnexionImage" class="img_presentation">
-                </div>
-
+            <div class="form-group">
+                <label for="password">Mot de passe:</label>
+                <input type="password" id="password" name="password" required>
             </div>
-
-        </div>
-    </main>
-
-    <footer>
-        <div class="container">
-            <div class="logo">
-                <img src="/images/mt-logo.png" alt="Logo" class="logo">
-            </div>
-
-            <div class="disposition_verticale">
-                
-                <div class="disposition_horizontale">
-                    <a href="#">A propos de nous</a>
-                    <a href="#">Nous contacter</a>
-                </div>
-
-                <div class="copyright">
-                    <p>Copyright - MT Rec 2024©</p>
-                </div>
-
-            </div>
-            
-        </div>
-        <!-- TODO: check footer and header consistency and uniformity accross all pages -->
-    
-    </footer>
-
-    <script>
-        function hashPassword() {
-            var champMdp = document.getElementById('mdp');
-            
-            // Hash le mot de passe
-            var hashedMdp = CryptoJS.SHA224(champMdp.value).toString();
-            
-            champMdp.value = hashedMdp;
-        }
-    </script>
-    <!--
-    <script>
-        document.getElementById('connexionForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-            
-            var formData = {
-                email: document.getElementById('email').value,
-                mdp: document.getElementById('mdp').value
-            };
-
-            fetch('/connexion/connectUser', {
-                method: "POST",
-                headers: {
-                    "content-Type": "application/json"
-                },
-                body: JSON.stringify(formData)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') { 
-                        alert(data.message);
-                        setTimeout(function() {
-                            window.location.href = data.redirect;
-                        }, 1000);
-                    } else {
-                        alert('Erreur de connexion');
-                    }
-                })
-                .catch((error) => {
-                    console.log('Erreur lors de la connexion: ', error);
-                    alert('Erreur de connexion');
-                });
-            
-        });
-    </script>
-    -->
-
+            <button type="submit">Se connecter</button>
+        </form>
+        <p>Pas encore inscrit? <a href="/inscription">Créer un compte</a></p>
+    </div>
 </body>
-
 </html>
-

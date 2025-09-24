@@ -1,0 +1,4 @@
+The public/fonts directory is intended to contain font files used in the application. Since you have not specified any particular font files to include, I will provide a comment indicating that this directory is meant for font files.
+
+public/fonts:
+# This directory is intended to contain font files used in the application.

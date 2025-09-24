@@ -1,54 +1,39 @@
-<table>
-    <thead>
-        <tr>
-            <% Object.keys(data[0]).forEach(function(key) { %>
-                <th><%= key %></th>
-            <% }); %>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        <% data.forEach(function(row) { %>
-            <tr>
-                <% for(let value of Object.values(row)) { %>
-                    <td><%= value %></td>
-                <% } %>
-                <td>
-                    <button class="update-button">Update</button>
-                    <button class="delete-button">Delete</button>
-                </td>
-            </tr>
-        <% }); %>
-    </tbody>
-</table>
-
-This template will create a table with a header row based on the keys of the objects in the data array, and a row for each object in the array. Each row will have an Update and Delete button.
-
-In your route handlers, you can render this template and pass the data to it:
-
-router.get('/', function(req, res, next) {
-    try {
-        offreDemploiModel.readall( function(result) {
-            if (result) {
-                res.render('table', {
-                    title: "Liste des offres d'emploi",
-                    data: result,
-                });
-            }
-            else {
-                throw new Error("Aucune offre d'emploi trouvée.");
-            }
-        });
-    } catch (error) {
-        res.status(500).json({
-            error: "Echec de la lecture des offres d'emploi.",
-        });
-        console.log("Echec de la lecture (readall) de la table offreDemploi: " + error);
-        next(error);
-    }
-});
-
-This will render the table.ejs template and pass the result of the database query to it as data.
-
-Please note that this is a basic example and may need to be adjusted based on your specific needs, such as adding URLs or data attributes to the Update and Delete buttons, or handling special cases in the data.
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table View</title>
+    <link rel="stylesheet" href="/stylesheets/general.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Data Table</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% data.forEach(item => { %>
+                    <tr>
+                        <td><%= item.id %></td>
+                        <td><%= item.name %></td>
+                        <td><%= item.email %></td>
+                        <td><%= item.role %></td>
+                        <td>
+                            <a href="/edit/<%= item.id %>">Edit</a>
+                            <a href="/delete/<%= item.id %>">Delete</a>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
