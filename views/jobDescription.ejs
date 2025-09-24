@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>MT Rec - ficheDePoste</title>
+    <link rel="stylesheet" href="/stylesheets/accueil.css" />
+    <link rel="stylesheet" href="/stylesheets/formulaires.css" />
+
+    <!-- 
+    <link rel='stylesheet' href='/stylesheets/connexion.css'>
+    <link rel='stylesheet' href='/stylesheets/general.css'>
+    -->
+  </head>
+
+  <body>
+    <header>
+      <div class="container">
+        <div class="logo">
+          <img src="/images/mt-logo.png" alt="Logo" class="logo" />
+        </div>
+
+        <nav>
+          <a href="#">Link 1</a>
+          <a href="#">link 2</a>
+          <a href="#">link 3</a>
+          <a href="#">link 4</a>
+          <a href="/connexion/disconnectUser" class="deconnexion"
+            >Deconnexion</a
+          >
+        </nav>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </header>
+
+    <main class="content">
+      <div>
+        <div class="disposition_verticale">
+          <div class="tableau">
+            <div class="titre-tableau">
+              <h3><%= title %></h3>
+            </div>
+
+            <table border>
+              <thead>
+                <tr>
+                  <th>Intitulé de poste</th>
+                  <th>Organisation</th>
+                  <th>Satut du poste</th>
+                  <th>Responsable hiérarchique</th>
+                  <th>Type Métier</th>
+                  <th>Lieu de la mission</th>
+                  <th>Rythme</th>
+                  <th>Fourchette salariale</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <% fichesDePoste.forEach((jobDescr)=> { %>
+                <tr>
+                  <td><%= jobDescr.jobTitle %></td>
+                  <td><%= jobDescr.idOrganization %></td>
+                  <td><%= jobDescr.statut_poste %></td>
+                  <td><%= jobDescr.resp_hierarch %></td>
+                  <td><%= jobDescr.jobType %></td>
+                  <td><%= jobDescr.jobLocation%></td>
+                  <td><%= jobDescr.rythme %></td>
+                  <td><%= jobDescr.salary %></td>
+                  <td><%= jobDescr.description %></td>
+                </tr>
+                <% } ) %>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="formulaire">
+            <div class="titre-formulaire">
+              <h3>Formulaire de création d'une fiche de poste</h3>
+            </div>
+
+            <form
+              action="/ficheDePoste/addJobDescribtion"
+              method="post"
+              id="jobDescriptionForm"
+            >
+              <label for="jobTitle du poste">jobTitle du poste:</label>
+              <input type="text" id="jobTitle" name="jobTitle" required /><br />
+
+              <label for="ID Organisation">ID Organisation:</label>
+              <input
+                type="text"
+                id="idOrganization"
+                name="idOrganization"
+                required
+              /><br />
+
+              <label for="Statut du poste">Statut du poste:</label>
+              <input
+                type="text"
+                id="statut_poste"
+                name="statut_poste"
+                required
+              /><br />
+
+              <label for="Responsable hiérarchique"
+                >Responsable hiérarchique:</label
+              >
+              <input
+                type="text"
+                id="resp_hierarch"
+                name="resp_hierarch"
+                required
+              /><br />
+
+              <label for="Type du métier">Type du métier:</label>
+              <input type="text" id="jobType" name="jobType" required /><br />
+
+              <label for="Lieu de la mission">Lieu de la mission:</label>
+              <input
+                type="text"
+                id="jobLocation"
+                name="jobLocation"
+                required
+              /><br />
+
+              <label for="Rythme">Rythme:</label>
+              <input type="text" id="rythme" name="rythme" required /><br />
+
+              <label for="salary">salary (brut):</label>
+              <input type="text" id="salary" name="salary" required /><br />
+
+              <label for="Description">Description:</label>
+              <input
+                type="text"
+                id="description"
+                name="description"
+                required
+              /><br />
+
+              <button type="submit">Send</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="logo">
+          <img src="/images/mt-logo.png" alt="Logo" class="logo" />
+        </div>
+
+        <div class="disposition_verticale">
+          <div class="disposition_horizontale">
+            <a href="#">A propos de nous</a>
+            <a href="#">Nous contacter</a>
+          </div>
+
+          <div class="copyright">
+            <p>Copyright - MT Rec 2024©</p>
+          </div>
+        </div>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </footer>
+  </body>
+</html>

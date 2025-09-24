@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+
+    <title>MT Rec - Devenir Recruteur</title>
+    <link rel="stylesheet" href="/stylesheets/accueil.css" />
+    <link rel="stylesheet" href="/stylesheets/formulaires.css" />
+
+    <!--
+    <link rel='stylesheet' href='/stylesheets/connexion.css'>
+    <link rel='stylesheet' href='/stylesheets/general.css'>
+    -->
+  </head>
+
+  <body>
+    <header>
+      <div class="container">
+        <div class="logo">
+          <a href="/candidat/accueilCandidat"
+            ><img src="/images/mt-logo.png" alt="Accueil" class="logo"
+          /></a>
+        </div>
+
+        <nav>
+          <!-- <a href='/candidat/listeOffres'>Liste des offres</a> -->
+          <a href="/candidat/gestionDesCandidaturesCandidat"
+            >Gérer mes candidatures</a
+          >
+          <a href="/candidat/devenirRecruteur">Devenir recruteur</a>
+          <a href="/candidat/monCompteCandidat">Mon compte</a>
+          <a href="/connexion/disconnectUser" class="deconnexion"
+            >Deconnexion</a
+          >
+        </nav>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </header>
+
+    <main class="content">
+      <div>
+        <div class="formulaire">
+          <div id="devenirRecruteurFormDiv" class="titre-formulaire">
+            <h3>Formulaire Devenir Recruteur</h3>
+          </div>
+
+          <form
+            id="devenirRecruteurForm"
+            action="/candidat/devenirRecruteur"
+            method="POST"
+          >
+            <label for="Organisation">Organisation(Siren, Nom):</label>
+            <select id="dropdown_siren" name="dropdown">
+              <% organisations.forEach(org => { %>
+              <option value="<%= org.siren %>#<%= org.nom %>">
+                <%= org.nom %>
+              </option>
+              <% }) %>
+            </select>
+
+            <!--
+                    <label for='sirenOrg'>SIREN Org:</label>
+                    <input id='sirenOrg' type='text' name='sirenOrg' required>
+                    
+                    <label for='nameOrg'>Nom Org:</label>
+                    <input id='nameOrg' type='text' name='nameOrg' required>
+                    -->
+
+            <label for="raison">Raison:</label>
+            <input id="raison" type="text" name="raison" required />
+
+            <input id="submit" type="submit" name="submit" value="Soumettre" />
+            <input id="reset" type="reset" name="reset" value="Effacer" />
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="logo">
+          <img src="/images/mt-logo.png" alt="Logo" class="logo" />
+        </div>
+
+        <div class="disposition_verticale">
+          <div class="disposition_horizontale">
+            <a href="#">A propos de nous</a>
+            <a href="#">Nous contacter</a>
+          </div>
+
+          <div class="copyright">
+            <p>Copyright - MT Rec 2024©</p>
+          </div>
+        </div>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </footer>
+
+    <script>
+      document.getElementById('devenirRecruteurForm').addEventListener('submit', function(event) {
+          event.preventDefault();
+
+          // Retrive the selected value from the dropdown
+          const selectedValue = document.getElementById('dropdown_siren').value;
+          const [sirenOrg, nameOrg] = selectedValue.split('#');
+
+          if (sirenOrg == '' || nameOrg == '' ||document.getElementById('raison').value == '') {
+              alert('Veuillez remplir tous les champs');
+              return false;
+          }
+
+          var formData = {
+              sirenOrg: sirenOrg,
+              nameOrg: nameOrg,
+              raison: document.getElementById('raison').value
+          }
+
+          fetch('/candidat/devenirRecruteur', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(formData)
+          })
+          .then(response => response.json())
+          .then(data => {
+              console.log(data);
+              if (data.status === 'success') {
+                  alert('Demande envoyee');
+                  window.location.href = '/candidat/accueilCandidat';
+              } else {
+                  alert(data.error);
+              }
+          })
+          .catch((error) => {
+              console.log(data);
+              alert('Erreur lors de l'envoi de la demande');
+          })
+      });
+    </script>
+  </body>
+</html>

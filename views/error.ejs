@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>MT Rec - Erreur <%= error.status %></title>
+    <link rel="stylesheet" href="/stylesheets/accueil.css" />
+
+    <!--
+    <link rel='stylesheet' href='/stylesheets/connexion.css'>
+    <link rel='stylesheet' href='/stylesheets/formulaires.css'>
+    <link rel='stylesheet' href='/stylesheets/general.css'>
+    -->
+  </head>
+
+  <body>
+    <header>
+      <div class="container">
+        <div class="logo">
+          <img src="/images/mt-logo.png" alt="Logo" class="logo" />
+        </div>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </header>
+
+    <main class="content">
+      <div class="disposition_verticale">
+        <div class="image_erreur">
+          <img
+            src="/images/cute-cat-sleeping-cartoon-icon-illustration-freepik.jpg"
+            alt="Erreur"
+          />
+        </div>
+        <div class="message_erreur">
+          <h2>Erreur <%= error.status %></h2>
+          <h3><%= message %></h3>
+          <pre><%= error.stack %></pre>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="logo">
+          <img src="/images/mt-logo.png" alt="Logo" class="logo" />
+        </div>
+
+        <div class="disposition_verticale">
+          <div class="disposition_horizontale">
+            <a href="#">A propos de nous</a>
+            <a href="#">Nous contacter</a>
+          </div>
+
+          <div class="copyright">
+            <p>Copyright - MT Rec 2024©</p>
+          </div>
+        </div>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </footer>
+
+    <!-- <% try { %>
+        <% if (session && session.homepage) { %>
+            <script>
+                setTimeout(function() {
+                    window.location.href = '<%= session.homepage %>';
+                }, 3000);
+                
+            </script>
+        <% } else { %>
+            <script>
+                console.log('No session or homepage found: Redirecting to default homepage.');
+                setTimeout(function() {
+                    window.location.href = '/';
+                }, 3000);
+                
+            </script>
+        <% } %>
+    <% } catch(errror) { %>
+        <% console.log(error); %>
+        <script>
+            console.log('An error occured: Redirecting to default homepage.');
+            setTimeout(function() {       
+                   window.location.href = '/';
+            }, 3000);
+        </script>
+    <% } %> -->
+  </body>
+</html>

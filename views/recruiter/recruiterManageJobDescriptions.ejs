@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang='fr'>
+
+<head>
+    <meta charset='utf-8'>
+     
+    <title>MT Rec - Gestion des fiches de postes de l\'organisation ORGANISATION_NAME </title>
+    <link rel='stylesheet' href='/stylesheets/accueil.css'>
+    <link rel='stylesheet' href='/stylesheets/formulaires.css'>
+    
+    <!--
+    <link rel='stylesheet' href='/stylesheets/connexion.css'>
+    <link rel='stylesheet' href='/stylesheets/general.css'>
+    -->
+</head>
+
+<body>
+
+    <header>
+        <div class='container'>
+            <div class='logo'>
+                <a href='/recruteur/accueilRecruteur'><img src='/images/mt-logo.png' alt='Accueil' class='logo'></a>
+            </div>
+        
+            <nav>
+                <a href='/recruteur/gestionOffresRecruteur/'>Gérer vos offres d'emploi</a>
+                <a href='/recruteur/gestionFichesDePoste'>Gérer vos fiches de postes</a>
+                <a href='/recruteur/demandeRejoindreOrg'>Rejoindre une organisation</a>
+                <a href='/recruteur/monCompteRecruteur'>Mon compte</a>
+                <a href='/connexion/disconnectUser' class='deconnexion'>Deconnexion</a>
+            </nav>
+        </div>
+        <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </header>
+
+    <main class='content'>
+        <div>
+            <div>
+                <button class='btn btn-outline btn-warning' onclick='redirectTo('/recruteur/creationFicheDePoste')'> Créer fiche de poste </button>
+            </div>
+
+            <div id='updateFicheDePosteFormDiv' class='formulaire' style='display: none;'>
+
+                <div class='titre-formulaire'>
+                    <h3>Mise a jour d'une fiche de poste</h3>
+                </div>
+
+                <form id='updateJobDescriptionForm' action='/recruteur/gestionFichesDePoste/' method='PUT'>
+                    <label for='jobTitle'>Intitulé : </label>
+                    <input type='text' id='intitule_update' name='intitule_update' required>
+    
+                    <label for='statut_poste'>Statut du poste : </label>
+                    <input type='text'  id='statut_poste_update' name='statut_poste_update' required>
+            
+                    <label for='resp_hierarch'>Responsable hiérarchique : </label>
+                    <input type='text'  id='resp_hierarch_update' name='resp_hierarch_update' required>
+    
+                    <label for='jobType'>Type de métier : </label>
+                    <input type='text'  id='type_metier_update' name='type_metier_update' required>
+    
+                    <label for='jobLocation'>Lieu mission : </label>
+                    <input type='text'  id='lieu_mission_update' name='lieu_mission_update' required>
+    
+                    <label for='rythme'>Rythme : </label>
+                    <input type='text'  id='rythme_update' name='rythme_update' required>
+    
+                    <label for='salary'>salary (brut) : </label>
+                    <input type='text'  id='salary_update' name='salary_update' required>
+    
+                    <label for='description'>Description : </label>
+                    <input type='text'  id='description_update' name='description_update' required>
+                    
+                    <input id='submit' type='submit' name='submit' value='Soumettre'>
+                    <input id='reset' type='reset' name='reset' onclick='hideUpdateForm()' value='Annuler'>
+                </form> 
+
+            </div>
+
+        <% if(fichesDePoste.length > 0) { %>
+            <div class='tableau'>
+                <div class='titre-tableau'>
+                    <h3> <%= title %> </h3>
+                </div>
+
+                <table border>
+
+                    <thead>
+                        <tr>
+                            <th>Intitulé de poste</th>
+                            <th>Organisation</th>
+                            <th>Satut du poste</th>
+                            <th>Responsable hiérarchique</th>
+                            <th>Type Métier</th> 
+                            <th>Lieu de la mission</th>
+                            <th>Rythme</th>
+                            <th>Fourchette salariale</th> 
+                            <th>Description</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <% fichesDePoste.forEach((jobDescr)=> { %>
+                            <tr>
+                                <td>
+                                    <%= jobDescr.jobTitle %>
+                                </td>
+                                <td>
+                                    <%= jobDescr.idOrganization %>
+                                </td>
+                                <td>
+                                    <%= jobDescr.statut_poste %>
+                                </td>
+                                <td>
+                                    <%= jobDescr.resp_hierarch %>
+                                </td>
+                                <td>
+                                    <%= jobDescr.jobType %>
+                                </td>
+                                <td>
+                                    <%= jobDescr.jobLocation%>
+                                </td>
+                                <td>
+                                    <%= jobDescr.rythme %>
+                                </td>
+                                <td>
+                                    <%= jobDescr.salary %>
+                                </td>
+                                <td>
+                                    <%= jobDescr.description %>
+                                </td>
+                            
+                                <td>
+                                    <button class='btn btn-outline btn-warning' onclick='updateFicheDePoste('<%= jobDescr.idJobDescription %>', '<%= jobDescr.jobTitle %>', '<%= jobDescr.idOrganization %>')'>Modifier</button>
+                                    <button class='btn btn-outline btn-danger' onclick='deleteFicheDePoste('<%= jobDescr.idJobDescription %>', '<%= jobDescr.jobTitle %>', '<%= jobDescr.idOrganization %>')'>Supprimer</button>
+                                </td>
+
+                            </tr>
+                        <% } ) %>
+                    </tbody>
+
+                </table>
+
+            </div>
+        <% } else { %>
+            <div class='message'>
+                <h3>Vous n'avez pas encore créé de fiche de poste</h3>
+                <p>Vous pouvez en créer une en cliquant sur le bouton ci-dessus.</p>
+            </div>
+        <% } %>
+
+        </div>
+    </main>
+
+    <footer>
+        <div class='container'>
+            <div class='logo'>
+                <img src='/images/mt-logo.png' alt='Logo' class='logo'>
+            </div>
+
+            <div class='disposition_verticale'>
+                
+                <div class='disposition_horizontale'>
+                    <a href='#'>A propos de nous</a>
+                    <a href='#'>Nous contacter</a>
+                </div>
+
+                <div class='copyright'>
+                    <p>Copyright - MT Rec 2024©</p>
+                </div>
+
+            </div>
+            
+        </div>
+        <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    
+    </footer>
+
+</body>
+
+<script> 
+    function redirectTo(route) {
+            window.location.href = route;
+        }
+
+        function hideUpdateForm() {
+            document.getElementById('updateFicheDePosteFormDiv').style.display = 'none';
+        }
+
+        function updateFicheDePoste(idJobDescription, jobTitle, idOrganization) {
+            const url = `/recruteur/gestionFichesDePoste/ficheDePoste?idJobDescription=${encodeURIComponent(idJobDescription)}&jobTitle=${encodeURIComponent(jobTitle)}&idOrganization=${encodeURIComponent(idOrganization)}`;
+            
+            var formData0 = {
+                idJobDescription : idJobDescription,
+                jobTitle : jobTitle,
+                idOrganization : idOrganization,
+            };
+
+            fetch('/recruteur/gestionFichesDePoste/ficheDePoste', {
+                method: 'POST',
+                headers: {
+                    'content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData0)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if(data.status === 'success') {
+                    var old_id_fichedeposte = data.ficheDePoste.idJobDescription ;
+                    var old_intitule = data.ficheDePoste.jobTitle ;
+                    var old_id_organisation = data.ficheDePoste.idOrganization ;
+                    var old_statut_poste = data.ficheDePoste.statut_poste ;
+                    var old_resp_hierarch = data.ficheDePoste.resp_hierarch ;
+                    var old_type_metier = data.ficheDePoste.jobType ;
+                    var old_lieu_mission = data.ficheDePoste.jobLocation ;
+                    var old_rythme = data.ficheDePoste.rythme ;
+                    var old_salary = data.ficheDePoste.salary ;
+                    var old_description = data.ficheDePoste.description;
+
+                    document.getElementById('intitule_update').value = old_intitule ;
+                    document.getElementById('statut_poste_update').value = old_statut_poste ;
+                    document.getElementById('resp_hierarch_update').value = old_resp_hierarch ;
+                    document.getElementById('type_metier_update').value = old_type_metier ;
+                    document.getElementById('lieu_mission_update').value = old_lieu_mission ;
+                    document.getElementById('rythme_update').value = old_rythme ;
+                    document.getElementById('salary_update').value = old_salary ;
+                    document.getElementById('description_update').value = old_description ;
+                    
+                    // Afficher le formulaire de mise a jour
+                    document.getElementById('updateFicheDePosteFormDiv').style.display = 'block';
+
+                    // Récupérer les nouvelles valeurs du formulaire et les envoyer quand le recruteur valide
+                    document.getElementById('updateJobDescriptionForm').addEventListener('submit', (event) => {
+                        event.preventDefault(); // empecher la soumission normale du formulaire
+                    
+                        var formData = {
+                            idJobDescription : old_id_fichedeposte,
+                            jobTitle : document.getElementById('intitule_update').value,
+                            idOrganization : old_id_organisation,
+                            statut_poste : document.getElementById('statut_poste_update').value,
+                            resp_hierarch :document.getElementById('resp_hierarch_update').value,
+                            jobType : document.getElementById('type_metier_update').value,
+                            jobLocation : document.getElementById('lieu_mission_update').value,
+                            rythme : document.getElementById('rythme_update').value,
+                            salary : document.getElementById('salary_update').value,
+                            description : document.getElementById('description_update').value,
+                        };
+
+                        // Envoyer les donnees du formulaires lorsque l'utilisteur soumet le formulaire
+                        fetch('/recruteur/gestionFichesDePoste/updateFicheDePoste', {
+                            method: 'PUT',
+                            headers: {
+                                'content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(formData),
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log(data);
+
+                            if(data.status === 'success') {
+                                alert ('Fiche de poste mise a jour !');
+                                //alert(data.message);
+
+                                // Cacher le formulaire de mise a jour
+                                document.getElementById('updateFicheDePosteFormDiv').style.display = 'block';
+
+                                // Recharger la page pour refléter la modification
+                                window.location.reload();
+                            } else {
+                                alert('Echec de la mise a jour de la fiche de poste !');
+                                // alert(data.error);
+                                // window.location.reload();
+                            }
+                        })
+                        .catch((error) => {
+                            console.log(error);
+
+                            alert('Erreur survenue lors de mise a  de la fiche de poste !');
+                            // window.location.reload();
+                        })
+                    });
+
+                } else {
+                    alert('Erreur survenue lors de la lecture de la fiche de poste !');
+                    //alert(data.error);
+                    // window.location.reload();
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+
+                alert('Erreur survenue lors de  la mise recuperation de la fiche de poste !');
+                // window.location.reload();
+            })  
+        }
+
+
+    function deleteFicheDePoste(idJobDescription, jobTitle, idOrganization) {
+        if (confirm('Êtes-vous sûr de vouloir supprimer cette fiche de poste ?')) {
+            var formData = {
+                idJobDescription : idJobDescription,
+                jobTitle : jobTitle,
+                idOrganization : idOrganization,
+            };
+
+            fetch('', {
+                method: 'DELETE',
+                headers: {
+                    'content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+
+                if(data.status === 'success') {
+                    alert('Fiche de poste supprimee !')
+                    //alert(data.message);
+                    window.location.reload();
+                } else {
+                    alert('Echec de la suppression de la fiche de poste !');
+                    // alert(data.error);
+                    // window.location.reload();
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+
+                alert('Erreur survenue lors de la suppression de la fiche de poste');
+                // window.location.reload();
+            })
+        }
+    }
+    
+</script>
+
+</html>
+

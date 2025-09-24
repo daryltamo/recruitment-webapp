@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang='fr'>
+
+<head>
+    <meta charset='utf-8'>
+     
+    <title>MT Rec - Accueil Candidat </title>
+    <link rel='stylesheet' href='/stylesheets/accueil.css'>
+    <link rel='stylesheet' href='/stylesheets/formulaires.css'>
+    
+
+    <!--<link rel='stylesheet' href='/stylesheets/general.css'>
+    <link rel='stylesheet' href='/stylesheets/connexion.css'>
+    TODO: use relative paths for stylesheets
+    -->
+</head>
+
+<body>
+
+    <header>
+        <div class='container'>
+            <div class='logo'>
+                <a href='/candidat/accueilCandidat'><img src='/images/mt-logo.png' alt='Accueil' class='logo'></a>
+            </div>
+            
+            <nav>
+                <!-- <a href='/candidat/listeOffres'>Liste des offres</a> -->
+                <a href='/candidat/gestionDesCandidaturesCandidat'>Gérer mes candidatures</a>
+                <a href='/candidat/devenirRecruteur'>Devenir recruteur</a>
+                <a href='/candidat/monCompteCandidat'>Mon compte</a>
+                <a href='/connexion/disconnectUser' class='deconnexion'>Deconnexion</a>
+            </nav>
+        </div>
+        <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </header>
+    
+    <main class='content'>
+        <div class='disposition_barre_recherche'>
+            <form class='formulaire_barre_recherche' action='/candidat/accueilCandidat/filterOffers' method='get' id='filterForm'>
+                <div class='disposition_horizontale'>
+                    <input class='barre_recherche barre1' type='text' name='recherche_offre' value='' placeholder='Rechercher une offre'>
+                    <input class='barre_recherche' type='text' name='recherche_orga' value='' placeholder='Nom de l'entreprise'>
+    
+                    <select class='barre_recherche' name='recherche_type'>
+                        <option value='' default>Type de poste</option>
+                        <option value='CDI'>CDI</option>
+                        <option value='CDD'>CDD</option>
+                        <option value='Stage'>Stage</option>
+                        <option value='Alternance'>Alternance</option>
+                        <option value='Saisonier'>Saisonier</option>
+                    </select><br>
+
+                    <div class='slider'>
+                        <label for='minimum_salary'>salary min.</label>
+                        <input type='range' id='minimum_salary' name='minimum_salary' min='0' max='100000' value='0' step='500' oninput='updateSalaryRange()'>
+                        <span id='minimum_salary_val'>0</span>€
+                    </div>
+    
+                    <input class='barre_recherche' type='text' name='recherche_lieu' value='' placeholder='Lieu du poste'>
+                    <button class='barre_recherche_submit' type='submit'>Search</button>
+                </div>
+            </form>
+        
+            <div class='offreList'>
+                <% offres.forEach(function(champ) { %>
+                    <div class='offre'>
+                        <div class='titreoffre'>Intitulé de l'offre : <%= champ.jobTitle %></div>
+                        <div class='salaryoffre'>salary (brut) : <%= champ.salary %></div>
+                        <div class='dateoffre'>Date : <%= champ.expirationDate.toLocaleDateString('fr-FR') %></div>
+                        <div class='lieuoffre'>Lieu : <%= champ.jobLocation %></div>
+                        <a class='lienoffre' href='/candidat/detailOffreCandidat/<%= champ.num %>' class='postuler'>Accéder à l'offre</a>
+                    </div>
+                <% }) %>
+            </div>
+    </main>
+
+
+    <footer>
+        <div class='container'>
+            <div class='logo'>
+                <img src='/images/mt-logo.png' alt='Logo' class='logo'>
+            </div>
+
+            <div class='disposition_verticale'>
+                
+                <div class='disposition_horizontale'>
+                    <a href='#'>A propos de nous</a>
+                    <a href='#'>Nous contacter</a>
+                </div>
+
+                <div class='copyright'>
+                    <p>Copyright - MT Rec 2024©</p>
+                </div>
+
+            </div>
+            
+        </div>
+        <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    
+    </footer>
+
+</body>
+
+<script>
+    function updateSalaryRange() {
+        var minSalary = document.getElementById('minimum_salary').value;
+        
+        document.getElementById('minimum_salary_val').innerText = minSalary;
+    }
+
+    // Initialize the salary range display
+    document.addEventListener('DOMContentLoaded', function() {
+        updateSalaryRange();
+    });
+</script>
+
+
+
+</html>
+

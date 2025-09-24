@@ -1,0 +1,232 @@
+/* From connexion */
+@font-face {
+  font-family: Kanit-Regular;
+  src: url(../fonts/Kanit-Regular.ttf);
+}
+
+body,
+html {
+  height: 100%;
+  margin: 0;
+  font-family: Kanit-Regular;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.img_presentation {
+  max-width: 100%;
+  margin-left: 50px;
+  height: auto;
+}
+
+.disposition_horizontale {
+  display: flex;
+  align-items: center;
+}
+
+.disposition_verticale_formulaire {
+  display: flex;
+  flex-direction: column;
+  margin-right: 50px;
+}
+
+/* From formulaire */
+
+.formulaire {
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  margin-left: 5%;
+  padding: 20px;
+  width: 300px;
+}
+
+.formulaire h2 {
+  margin-top: 0;
+}
+
+.formulaire,
+a {
+  margin-bottom: 10px;
+}
+
+.formulaire label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.formulaire input[type="text"],
+.formulaire input[type="tel"],
+.formulaire input[type="email"],
+.formulaire input[type="password"],
+.formulaire textarea {
+  width: 95%;
+  padding: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.formulaire input[type="submit"] {
+  background-color: #0074d9;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.formulaire input[type="submit"]:hover {
+  background-color: #0000ff;
+}
+
+.formulaire input[type="submit"]:active {
+  background-color: #00008b;
+}
+
+.formulaire input[type="reset"] {
+  background-color: #ff0000;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.formulaire input[type="reset"]:hover {
+  background-color: #cc0000;
+}
+
+.formulaire input[type="reset"]:active {
+  background-color: #990000;
+}
+
+/* From accueil */
+@font-face {
+  font-family: Kanit-Regular;
+  src: url(../fonts/Kanit-Regular.ttf);
+}
+
+@font-face {
+  font-family: Kanit-Bold;
+  src: url(../fonts/Kanit-Bold.ttf);
+}
+
+body,
+html {
+  height: 100%;
+  margin: 0;
+  font-family: Kanit-Regular;
+  justify-content: center;
+  align-items: center;
+}
+
+header {
+  margin-top: 0;
+  background-color: #0074d9;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+footer {
+  margin-bottom: 0;
+  background-color: #0074d9;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+}
+
+nav {
+  padding: 10px 0;
+  text-align: center;
+}
+
+nav,
+a {
+  text-decoration: none;
+  font-family: Kanit-Regular;
+  color: white;
+  font-size: 20px;
+  margin-left: 20px;
+}
+
+ul {
+  margin-right: 10%;
+  list-style-type: none;
+  font-family: Kanit-Regular;
+  color: black;
+  font-size: 36px;
+}
+
+h2 {
+  text-align: center;
+  font-family: Kanit-Bold;
+  color: black;
+  font-size: 80px;
+  margin-left: 5%;
+}
+
+.logo {
+  max-width: 5%;
+  margin-left: 10px;
+  height: auto;
+}
+
+.deconnexion {
+  color: #f7483b;
+}
+
+.disposition_horizontale {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+}
+.disposition_verticale {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.disposition_categorie_bouton {
+  display: flex;
+  flex-direction: column;
+  max-width: 10%;
+  height: 10%;
+  font-size: 20px;
+  text-align: center;
+}
+
+img {
+  width: 200px;
+  height: 200px;
+}
+
+button {
+  margin: 10px;
+  padding: 10px 20px;
+  background-color: #0074d9;
+  color: white;
+  font-family: Kanit-Regular;
+  font-size: 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+button:active {
+  background-color: #003d80;
+}

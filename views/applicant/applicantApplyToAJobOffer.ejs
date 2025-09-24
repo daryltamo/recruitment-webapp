@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+
+    <title>MT Rec - Candidature à l'offre d'emploi</title>
+    <link rel="stylesheet" href="/stylesheets/accueil.css" />
+
+    <!--
+    <link rel='stylesheet' href='/stylesheets/connexion.css'>
+    <link rel='stylesheet' href='/stylesheets/formulaires.css'>
+    <link rel='stylesheet' href='/stylesheets/general.css'>
+    -->
+  </head>
+
+  <body>
+    <header>
+      <div class="container">
+        <div class="logo">
+          <a href="/candidat/accueilCandidat"
+            ><img src="/images/mt-logo.png" alt="Accueil" class="logo"
+          /></a>
+        </div>
+
+        <nav>
+          <!-- <a href='/candidat/listeOffres'>Liste des offres</a> -->
+          <a href="/candidat/gestionDesCandidaturesCandidat"
+            >Gérer mes candidatures</a
+          >
+          <a href="/candidat/devenirRecruteur">Devenir recruteur</a>
+          <a href="/candidat/monCompteCandidat">Mon compte</a>
+          <a href="/connexion/disconnectUser" class="deconnexion"
+            >Deconnexion</a
+          >
+        </nav>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </header>
+
+    <main class="content">
+      <div>
+        <div class="formulaire">
+          <div id="candidatureFormDiv" class="titre-formulaire">
+            <h3>Candidature à une offre d'emploi</h3>
+          </div>
+
+          <form
+            id="candidatureForm"
+            action="/candidat/candidatureAUneOffre/upload?id_offre=<%=id_offre%>"
+            method="POST"
+            enctype="multipart/form-data"
+          >
+            <label for="cv">CV:</label>
+            <input type="file" id="cv" name="cv" accept=".pdf,.doc,.docx" />
+
+            <label for="lettre_motivation">LM:</label>
+            <input
+              type="file"
+              id="lettre_motivation"
+              name="lettre_motivation"
+              accept=".pdf,.doc,.docx"
+            />
+
+            <label for="autre_document"
+              >Autre document supplémentaire : (Facultatif)</label
+            >
+            <input
+              type="file"
+              id="autre_document"
+              name="autre_document"
+              accept=".pdf,.doc,.docx"
+            /><br /><br />
+
+            <input id="submit" type="submit" name="submit" value="Soumettre" />
+            <input id="reset" type="reset" name="reset" value="Annuler" />
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="logo">
+          <img src="/images/mt-logo.png" alt="Logo" class="logo" />
+        </div>
+
+        <div class="disposition_verticale">
+          <div class="disposition_horizontale">
+            <a href="#">A propos de nous</a>
+            <a href="#">Nous contacter</a>
+          </div>
+
+          <div class="copyright">
+            <p>Copyright - MT Rec 2024©</p>
+          </div>
+        </div>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </footer>
+
+    <script>
+      // TODO: make a hidden form that appears when the update button is clicked
+      function hideUpdateForm() {
+        document.getElementById("candidatureFormDiv").style.display = "none";
+      }
+
+      document
+        .getElementById("candidatureForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault(); // Empêcher la soumission normale du formulaire
+
+          // Récupérer les valeurs du formulaire
+          var formData = new FormData(this);
+
+          // Envoi des données du formulaire en utilisant fetch API
+          fetch(
+            "/candidat/candidatureAUneOffre/upload?id_offre=<%=id_offre%>",
+            {
+              method: "POST",
+              body: formData,
+            }
+          )
+            .then((response) => response.json())
+            .then((data) => {
+              console.log(data);
+              if (data.status === "success") {
+                alert(data.message);
+                window.location.href =
+                  "/candidat/gestionDesCandidaturesCandidat";
+              } else {
+                alert(data.error);
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+              alert(
+                "Une erreur est survenue lors de la soumission du formulaire"
+              );
+            });
+        });
+    </script>
+  </body>
+</html>

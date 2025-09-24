@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+
+    <title>MT Rec - Liste des demandes d'attribution d\'organisation</title>
+    <link rel="stylesheet" href="/stylesheets/accueil.css" />
+
+    <!--
+    <link rel='stylesheet' href='/stylesheets/connexion.css'>
+    <link rel='stylesheet' href='/stylesheets/formulaires.css'>
+    <link rel='stylesheet' href='/stylesheets/general.css'>
+    -->
+  </head>
+
+  <body>
+    <header>
+      <div class="container">
+        <div class="logo">
+          <a href="/admin/accueilAdmin"
+            ><img src="/images/mt-logo.png" alt="Accueil" class="logo"
+          /></a>
+        </div>
+
+        <nav>
+          <a href="/admin/gestionOrganisations">Gérer les organisations</a>
+          <a href="/admin/gestionUtilisateurs">Gérer les utilisateurs</a>
+          <a href="/admin/listeDemandesDevenirRecruteur"
+            >Demandes DevenirRecruteur</a
+          >
+          <a href="/admin/listeDemandesDevenirAdmin">Demandes Devenir Admin</a>
+          <a href="/admin/listeDemandesRejoindreOrg">Demandes Rejoindre Org</a>
+          <a href="/admin/listeDemandesAjoutOrg">Demandes Ajout Org</a>
+          <a href="/admin/monCompteAdmin">Mon compte</a>
+          <a href="/connexion/disconnectUser" class="deconnexion"
+            >Deconnexion</a
+          >
+        </nav>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </header>
+
+    <main class="content">
+      <div>
+        <div class="disposition_verticale">
+          <% if (demandes.length > 0) { %>
+          <div class="tableau">
+            <div class="titre-tableau">
+              <h3><%= title %></h3>
+            </div>
+
+            <table border="1">
+              <thead>
+                <th>ID Demande</th>
+                <th>ID Utilisateur</th>
+                <th>Siren Org</th>
+                <th>Nom Orga</th>
+                <th>Raison</th>
+                <th>Date de Création</th>
+                <th>Statut Demande</th>
+                <th>Actions</th>
+              </thead>
+
+              <tbody>
+                <% demandes.forEach(function(demande) { %>
+                <tr>
+                  <td><%= demande.idRequest %></td>
+                  <td><%= demande.idUser %></td>
+                  <td><%= demande.sirenTargetOrg %></td>
+                  <td><%= demande.nameTargetOrg %></td>
+                  <td><%= demande.raison %></td>
+                  <td>
+                    <%=
+                    demande.date_creation_demande.toLocaleDateString('fr-FR') %>
+                  </td>
+                  <td><%= demande.requestStatus %></td>
+                  <% if (demande.requestStatus === 'En attente') { %>
+                  <!-- TODO: s'assurer que les boutons s'affichent seulement pour les demande qui sont un statut 'En attente' -->
+                  <td>
+                    <button
+                      class="btn btn-outline btn-warning"
+                      onclick="accepterDemande("
+                      <%="demande.idRequest"
+                      %
+                    >
+                      ', '<%= demande.idUser %>', '<%= demande.sirenTargetOrg
+                      %>', '<%= demande.nameTargetOrg %>', '<%= demande.raison
+                      %>')'> Accepter
+                    </button>
+                    <button
+                      class="btn btn-outline btn-success"
+                      onclick="refuserDemande("
+                      <%="demande.idRequest"
+                      %
+                    >
+                      ')'> Refuser
+                    </button>
+                  </td>
+                  <% } %>
+                </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+          <% } else { %>
+          <h3>Aucune demande d'attribution d\'organisation pour le moment !</h3>
+          <% } %>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="logo">
+          <img src="/images/mt-logo.png" alt="Logo" class="logo" />
+        </div>
+
+        <div class="disposition_verticale">
+          <div class="disposition_horizontale">
+            <a href="#">A propos de nous</a>
+            <a href="#">Nous contacter</a>
+          </div>
+
+          <div class="copyright">
+            <p>Copyright - MT Rec 2024©</p>
+          </div>
+        </div>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </footer>
+
+    <script>
+      function accepterDemande(idRequest, idUser, sirenOrg, nameOrg, raison) {
+        var formData = {
+          idRequest: idRequest,
+          idUser: idUser,
+          sirenOrg: sirenOrg,
+          nameOrg: nameOrg,
+          raison: raison,
+        };
+
+        fetch("/admin/listeDemandesRejoindreOrg/accept/" + idRequest, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+            if (data.status === "success") {
+              alert(data.message);
+              window.location.reload();
+            } else {
+              alert(data.error);
+            }
+          })
+          .catch((error) => {
+            console.log("Error:", error);
+            alert("Erreur lors de l'acceptation de la demande");
+          });
+      }
+
+      function refuserDemande(idRequest) {
+        fetch("/demande/demandeRejoindreOrg/refuse/" + idRequest, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+            if (data.status === "success") {
+              alert(data.message);
+              window.location.reload();
+            } else {
+              alert(data.error);
+            }
+          })
+          .catch((error) => {
+            console.log("Error:", error);
+            alert("Erreur lors du refus de la demande");
+          });
+      }
+    </script>
+  </body>
+</html>

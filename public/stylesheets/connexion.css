@@ -1,0 +1,28 @@
+@font-face {
+    font-family: Kanit-Regular;
+    src: url(../fonts/Kanit-Regular.ttf);
+}
+
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: Kanit-Regular;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.img_presentation {
+    max-width: 100%;
+    margin-left: 50px;
+    height: auto;
+}
+
+.disposition_horizontale {
+    display: flex;
+    align-items: center;
+}
+

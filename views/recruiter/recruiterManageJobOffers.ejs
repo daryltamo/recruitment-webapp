@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang='fr'>
+
+<head>
+    <meta charset='utf-8'>
+     
+    <title>MT Rec - Gestion des offres recruteur</title>
+    <link rel='stylesheet' href='/stylesheets/accueil.css'>
+    <link rel='stylesheet' href='/stylesheets/formulaires.css'>
+
+    <!--
+    <link rel='stylesheet' href='/stylesheets/connexion.css'>
+    <link rel='stylesheet' href='/stylesheets/formulaires.css'>
+    <link rel='stylesheet' href='/stylesheets/general.css'>
+    -->
+</head>
+
+<body>
+
+    <header>
+        <div class='container'>
+            <div class='logo'>
+                <a href='/recruteur/accueilRecruteur'><img src='/images/mt-logo.png' alt='Accueil' class='logo'></a>
+            </div>
+        
+            <nav>
+                <a href='/recruteur/gestionOffresRecruteur/'>Gérer vos offres d'emploi</a>
+                <a href='/recruteur/gestionFichesDePoste'>Gérer vos fiches de postes</a>
+                <a href='/recruteur/demandeRejoindreOrg'>Rejoindre une organisation</a>
+                <a href='/recruteur/monCompteRecruteur'>Mon compte</a>
+                <a href='/connexion/disconnectUser' class='deconnexion'>Deconnexion</a>
+            </nav>
+        </div>
+        <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </header>
+
+    <div class='popup' id='popup'>
+        <h2>Modification de l'offre</h2>
+        <p>Ce texte apparaitra dans une fenêtre de type pop-up.</p>
+        <p>Celle-ci ne sera activée que lorsque l\'utilisateur cliquera sur le lien adéquat.</p>
+        <button onclick='closePopup()'>Fermer</button>
+    </div>
+
+    <main class='content'>
+        <div>
+
+            <div class='disposition_verticale'>
+                <div>
+                    <!-- <a class='btn btn-outline btn-warning' href='/recruteur/creationOffre' role='button'>Créer une offre</a> -->
+                    <button class='btn btn-outline btn-warning'><a href='/recruteur/creationOffre'>Créer une offre</a></button>
+                </div>
+            
+                <div class='formulaire' id='updateOffreDemploiFormDiv' style='display: none;'>
+
+                    <div class='titre-formulaire'>
+                        <h3>Mise à jour d'une offre d'emploi</h3>
+                    </div>
+                    
+                    <form id='updateOfferForm' action='/recruteur/gestionOffresRecruteur' method='PUT'>
+                        <label for='Numéro de l'offre'>Nom de l'offre:</label>
+                        <select id='dropdown_IdFicheDePoste_update' name='dropdown_IdFicheDePoste_update' required>
+                            <% fichesDePoste.forEach(fiche => { %>
+                                <option value='<%= fiche.idJobDescription %>'><%= fiche.jobTitle %></option>
+                            <% }) %>
+                        </select>
+                
+                        <label for='Date de fin de validité'>Date de fin de validité:</label>
+                        <input type='date' id='date_validite_update' name='date_validite_update' required><br>
+                        
+                        <label for='Indication'>Indication:</label>
+                        <input type='text' id='indication_update' name='indication_update' required><br>
+                        
+                        <label for='Documents requis'>Nombre documents requis:</label>
+                        <input type='text' id='num_docs_req_update' name='num_docs_req_update' required><br>
+                        
+                        <label for='Etat'>Etat:</label>
+                        <select id='dropdown_etatOffre_update' name='dropdown_etatOffre_update' required>
+                            <option value='non_publié'>Non publiée</option>
+                            <option value='non_publiée'>Publiée</option>
+                        </select>
+                        
+                        <input type='submit' id='submit' name='submit' value='Soumettre'>
+                        <input type='reset' id='reset' name='reset' value='Effacer'>
+                    </form>
+                    
+                </div>
+
+            <% if(offres.length > 0) { %>
+
+                <div class='tableau'>
+                    <div class='titre-tableau'>
+                        <h3> <%= title %> </h3>
+                    </div>
+
+                    <table border>
+
+                        <thead>
+                            <th>Num Offre</th>
+                            <th>ID ficheDePoste</th>
+                            <th>Nombre de documents requis</th>
+                            <th>Etat</th>
+                            <th>Date de validité</th>
+                            <th>Actions</th>
+                        </thead>
+
+                        <tbody>
+                            <% offres.forEach((offer)=> { %>
+                                <tr>
+                                    <td>
+                                        <%= offer.num %>
+                                    </td>
+                                    <td>
+                                        <%= offer.idJobDescription %>
+                                    </td>
+                                    <td>
+                                        <%= offer.numberOfRequiredDocuments %>
+                                    </td>
+                                    <td>
+                                        <%= offer.state %>
+                                    </td>
+                                    <td>
+                                        <%= offer.expirationDate.toLocaleDateString('fr-FR') %>
+                                    </td>
+                                    <td>
+                                        <button class='btn btn-outline btn-warning' onclick='updateOffer('<%= offer.num %>')'> Modifier </button>
+                                        <button class='btn btn-outline btn-success' onclick='deleteoffer('<%= offer.num %>')'> Supprimer </button>
+                                        <button class='btn btn outline' onclick='consultOffer('<%= offer.num %>')'>Consulter</button>
+                                        <button class='btn btn-outline' onclick='viewApplicationsToOffer('/recruteur/gestionOffresRecruteur', '<%= offer.num %>')'>Voir les candidatures</button>
+                                    </td>
+                                </tr>
+                            <% } ) %>
+                        </tbody>
+
+                    </table>
+
+                </div>
+            
+            <% } else { %>
+
+                <div class='message'>
+                    <h3>Vous n'avez pas encore créé d'offres d'emploi.</h3>
+                    <p>Vous pouvez en créer une en cliquant sur le bouton ci-dessus.</p>
+                </div>
+
+            <% } %>
+
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        <div class='container'>
+            <div class='logo'>
+                <img src='/images/mt-logo.png' alt='Logo' class='logo'>
+            </div>
+
+            <div class='disposition_verticale'>
+                
+                <div class='disposition_horizontale'>
+                    <a href='#'>A propos de nous</a>
+                    <a href='#'>Nous contacter</a>
+                </div>
+
+                <div class='copyright'>
+                    <p>Copyright - MT Rec 2024©</p>
+                </div>
+
+            </div>
+            
+        </div>
+        <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    
+    </footer>
+    
+    <script>
+        function redirectTo(url) {
+            window.location.href = url;
+        }
+
+        function hideUpdateForm() {
+            document.getElementById('updateOffreDemploiFormDiv').style.display = 'none';
+        }
+
+        function updateOffer(num) {
+            // Récupérer les valeurs des champs de l'offre d'emploi
+            fetch('/recruteur/gestionOffresRecruteur' + num, {
+                method: 'GET',
+                headers: {
+                    'content-Type': 'application/json'
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+
+                if(data.status === 'success') {
+                    
+                    var old_id_fichedeposte = data.offre.idJobDescription ;
+                    var old_date_validite = data.offre.expirationDate ;
+                    var old_indication = data.offre.indication ;
+                    var old_num_docs_required = data.offre.num_docs_required ;
+                    var old_etat = data.offre.state;
+
+                    // Pré-remplir le formulaire de mise à jour le formulaire avec les anciennes valeurs
+                    document.getElementById('dropdown_IdFicheDePoste_update').value = old_id_fichedeposte ;
+                    document.getElementById('date_validite_update').value = old_date_validite ;
+                    document.getElementById('indication_update').value = old_indication ;
+                    document.getElementById('num_docs_req_update').value = old_num_docs_required ;
+                    document.getElementById('dropdown_etatOffre_update').value = old_etat ;
+                    
+                    // Affcher le formulaire de mise à jour
+                    document.getElementById('updateOffreDemploiFormDiv').style.display = 'block';
+
+                    // Récupérer les nouvelles valeurs du formulaire et les envoyer quand le recruteur valide
+                    document.getElementById('updateOfferForm').addEventListener('submit', (event) => {
+                        event.preventDefault(); // empecher la soumission normale du formulaire
+
+                        var formData = {
+                            idJobDescription : document.getElementById('dropdown_IdFicheDePoste_update').value,
+                            expirationDate : document.getElementById('date_validite_update').value,
+                            indication : document.getElementById('indication_update').value,
+                            num_docs_required : document.getElementById('num_docs_req_update').value,
+                            state : document.getElementById('dropdown_etatOffre_update').value,
+                        };
+
+                        // Envoyer les donnees du formulaires lorsque l'utilisteur soumet le formulaire
+                        fetch('/recruteur/gestionOffresRecruteur' + num, {
+                            method: 'PUT',
+                            headers: {
+                                'content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(formData),
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log(data);
+
+                            if(data.status === 'success') {
+                                alert('Offre mise a jour');
+                                // alert(data.message);
+
+                                // Cacher le formulaire de mise a jour
+                                document.getElementById('updateOffreDemploiFormDiv').style.display = 'none';
+
+                                // Recharger la page pour refléter la modification
+                                window.location.reload();
+                            } else {
+                                alert('Erreur survenue lors de la mise a jour de l'offre');
+                                // alert(data.error);
+                                // window.location.reload();
+                            }
+                        })
+                        .catch((error) => {
+                            console.log('Erreur' + error);
+                            alert('Erreur survenue lors de ');
+                        });
+                    });
+                } else {
+                    alert('Erreur survenue lors de la lecture de l'offre ou des fiches de poste');
+                    // alert(data.error);
+                    // window.location.reload();
+                }
+            })
+            .catch((error) => {
+                console.log('Erreur' + error);
+
+                alert('Erreur survenue lors de la recuperatin de l'offre d'emploi');
+                // window.location.reload();
+            });
+        }
+
+        function deleteoffer(offerNumber) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette offre ?')) {
+                var formData = {
+                    offerNumber : offerNumber,
+                };
+
+                fetch('/recruteur/gestionOffresRecruteur/' + offerNumber, {
+                    method: 'DELETE',
+                    headers: {
+                        'content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+
+                    if(data.status === 'success') {
+                        alert('Offre d'emploi supprimee !');
+                        // alert(data.message);
+                        window.location.reload();
+                    } else {
+                        alert('Echec de la suppression de l'offre !');
+                        // alert(data.error);
+                        // window.location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.log(error);
+
+                    alert('Erreur lors de la suppression de l\'offre');
+                    // window.location.reload();
+                });
+            }
+        }
+
+        function consultOffer(num) {
+            window.location.href = '/recruteur/detailOffreRecruteur/' + num;
+        }
+
+        function viewApplicationsToOffer(num) {
+            window.location.href = '/recruteur/gestionCandAUneOffre/' + num;
+        }
+
+        // Script pour gérer l'ouverture et la fermeture du popup
+        function ouvrirPopup() {
+            document.getElementById('popup').classList.add('active');
+            document.getElementById('overlay').classList.add('active');
+        }
+
+        function fermerPopup() {
+            document.getElementById('popup').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+        }
+    </script>
+    
+</script>
+
+
+</html>
+

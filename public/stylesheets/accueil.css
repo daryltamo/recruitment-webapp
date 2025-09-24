@@ -1,0 +1,303 @@
+@font-face {
+    font-family: Kanit-Regular;
+    src: url(../fonts/Kanit-Regular.ttf);
+}
+
+@font-face {
+    font-family: Kanit-Bold;
+    src: url(../fonts/Kanit-Bold.ttf);
+}
+
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: Kanit-Regular;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.content {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+}
+
+nav, nav a {
+    text-decoration: none;
+    font-family: Kanit-Regular;
+    color: white;
+    font-size: 20px;
+    margin-left: 20px;
+}
+
+a {
+    text-decoration: none;
+    font-family: Kanit-Regular;
+    color: white;
+    font-size: 20px;
+    margin-left: 20px;
+}
+
+nav {
+    padding: 10px 0;
+    text-align: center;
+}
+
+header {
+    margin-top: 0;
+    background-color: #0074D9;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+footer {
+    margin-bottom: 0;
+    background-color: #0074D9;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.container .logo {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+footer .container nav {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    
+}
+
+footer .container {
+    font-family: Kanit-Regular;
+    color: white;
+}
+
+footer .container nav a {
+    text-decoration: none;
+    font-family: Kanit-Regular;
+    color: white;
+    font-size: 20px;
+    margin-left: 20px;
+    
+}
+
+.logo {
+    max-width: 25%;
+    margin-left: 10px;
+    height: auto;
+}
+
+.copyright {
+    font-family: Kanit-Regular;
+    color: white;
+    font-size: 20px;
+    align-items: center;
+    margin: 20px auto 0;
+    text-align: center;
+}
+
+
+footer .container .copyright {
+    display: flex;
+    font-family: Kanit-Regular;
+    color: white;
+    font-size: 20px;
+    align-items: center;
+    margin-bottom: 0;
+}
+
+
+ul {
+    margin-right: 10%;
+    list-style-type: none;
+    font-family: Kanit-Regular;
+    color: black;
+    font-size: 36px;
+}
+
+h1 {
+    text-align: center;
+    font-family: Kanit-Bold;
+    color: black;
+    font-size: 80px;
+    margin-left: 5%;
+}
+
+h2 {
+    text-align: center;
+    font-family: Kanit-Bold;
+    color: black;
+    font-size: 50px;
+    margin-left: 5%;
+}
+
+h3 {
+    text-align: center;
+    font-family: Kanit-Bold;
+    color: black;
+    font-size: 30px;
+    margin-left: 5%;
+}
+
+.offreList{
+    display:grid;
+    grid-template-columns: 40% 40%;
+    justify-content: space-between;
+    grid-row-gap: 20%;
+    overflow: auto;   
+}
+
+.offreList a{
+    color: #0074D9;
+    border: solid 1px;
+    border-radius: 4px;
+    padding: 1px;
+    margin:0;
+}
+
+.offre{
+    border:solid 2px #0074D9;
+    border-radius: 4px;
+    padding: 8px;
+}
+
+.deconnexion {
+    color: #f7483b;
+}
+
+.image_erreur {
+    height: auto;
+    align-items: center;
+    display: block;
+}
+
+.disposition_horizontale {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.disposition_barre_recherche {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.disposition_verticale {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.disposition_categorie_bouton {
+    display: flex;
+    flex-direction: column;
+    max-width: 10%;
+    height: 10%;
+    font-size: 20px;
+    text-align: center;
+}
+
+img {
+    width: 200px;
+    height: 200px;
+}
+
+.img_presentation {
+    max-width: 100%;
+    margin-left: 20px;
+    height: auto;
+}
+
+button {
+    margin: 10px;
+    padding: 10px 20px;
+    background-color: #0074D9;
+    color: white;
+    font-family: Kanit-Regular;
+    font-size: 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+button:active {
+    background-color: #003d80;
+}
+
+.password-requirements {
+    text-align: center;
+    list-style-type: none; /* Remove default list styling */
+    padding: 0; /* Remove default padding */
+}
+.password-requirements li {
+    font-family: Kanit-Regular;
+    font-size: 15px;
+}
+
+.password-requirements .invalid {
+    color: red; /* Change the text color for invalid criteria */
+    margin: 5px 0; /* Add some space between each list item */
+}
+
+.password-requirements .valid {
+    color: green; /* Change the text color for valid criteria */
+    margin: 5px 0; /* Add some space between each list item */
+}
+
+.popup {
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    background: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.popup.active {
+    display: block;
+}
+
+.overlay {
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 500;
+}
+
+.overlay.active {
+    display: block;
+}
+

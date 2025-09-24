@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>MT Rec - Erreur <%= error.status %></title>
+    <link rel="stylesheet" href="/stylesheets/accueil.css" />
+
+    <!--
+    <link rel='stylesheet' href='/stylesheets/connexion.css'>
+    <link rel='stylesheet' href='/stylesheets/formulaires.css'>
+    <link rel='stylesheet' href='/stylesheets/general.css'>
+    -->
+  </head>
+
+  <body>
+    <header>
+      <div class="container">
+        <div class="logo">
+          <img src="/images/mt-logo.png" alt="Logo" class="logo" />
+        </div>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </header>
+
+    <main class="content">
+      <div>
+        <div class="disposition_verticale">
+          <div class="image_erreur">
+            <img
+              src="/images/cute-cat-sleeping-cartoon-icon-illustration-freepik.jpg"
+              alt="Erreur"
+            />
+          </div>
+
+          <% if (offre.length > 0) {%>
+          <div class="offreList">
+            <% offre.forEach(function(champ) { %>
+            <div class="offre">
+              <div class="titreoffre">
+                Intitulé de l'offre : <%= champ.jobTitle %>
+              </div>
+              <div class="descoffre">
+                Description de l'offre : <%= champ.description %>
+              </div>
+              <div class="salaryoffre">salary : <%= champ.salary %></div>
+              <div class="dateoffre">
+                Date : <%= champ.expirationDate.toLocaleDateString('fr-FR') %>
+              </div>
+              <div class="lieuoffre">Lieu : <%= champ.jobLocation %></div>
+              <div class="typemetieroffre">
+                Type de métier : <%= champ.jobType %>
+              </div>
+              <div class="rythmeoffre">
+                Type de métier : <%= champ.rythme %>
+              </div>
+              <div class="docoffre">
+                Nombre de documents nécessaires : <%=
+                champ.numberOfRequiredDocuments %>
+              </div>
+              <a
+                class="lienoffre"
+                href="/candidat/candidatureAUneOffre/<%= champ.num %>"
+                class="postuler"
+                >Candidater</a
+              >
+            </div>
+            <% }) %>
+          </div>
+
+          <% else { %>
+          <div class="message">
+            <h3>Offre indisponible</h3>
+          </div>
+          <% } %>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="logo">
+          <img src="/images/mt-logo.png" alt="Logo" class="logo" />
+        </div>
+
+        <div class="disposition_verticale">
+          <div class="disposition_horizontale">
+            <a href="#">A propos de nous</a>
+            <a href="#">Nous contacter</a>
+          </div>
+
+          <div class="copyright">
+            <p>Copyright - MT Rec 2024©</p>
+          </div>
+        </div>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </footer>
+
+    <script>
+      setTimeout(function () {
+        window.location.href = "/";
+      }, 10000);
+    </script>
+  </body>
+</html>

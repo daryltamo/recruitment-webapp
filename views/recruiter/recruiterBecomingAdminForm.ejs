@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+
+    <title>MT Rec - Devenir Admin</title>
+    <link rel="stylesheet" href="/stylesheets/accueil.css" />
+    <link rel="stylesheet" href="/stylesheets/formulaires.css" />
+
+    <!--
+    <link rel='stylesheet' href='/stylesheets/connexion.css'>
+    <link rel='stylesheet' href='/stylesheets/general.css'>
+    -->
+  </head>
+
+  <body>
+    <header>
+      <div class="container">
+        <div class="logo">
+          <a href="/recruteur/accueilRecruteur"
+            ><img src="/images/mt-logo.png" alt="Accueil" class="logo"
+          /></a>
+        </div>
+
+        <nav>
+          <a href="/recruteur/gestionOffresRecruteur/"
+            >Gérer vos offres d'emploi</a
+          >
+          <a href="/recruteur/gestionFichesDePoste"
+            >Gérer vos fiches de postes</a
+          >
+          <a href="/recruteur/demandeRejoindreOrg"
+            >Rejoindre une organisation</a
+          >
+          <a href="/recruteur/devenirAdmin">DevenirAdmin</a>
+          <a href="/recruteur/monCompteRecruteur">Mon compte</a>
+          <a href="/connexion/disconnectUser" class="deconnexion"
+            >Deconnexion</a
+          >
+        </nav>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </header>
+
+    <main class="content">
+      <div>
+        <div class="formulaire">
+          <div id="devenirAdminFormDiv" class="titre-formulaire">
+            <h3>Formulaire Devenir Admin</h3>
+          </div>
+
+          <form
+            id="devenirAdminForm"
+            action="/recruteur/devenirAdmin"
+            method="POST"
+          >
+            <label for="raison">Raison:</label>
+            <input id="raison" type="text" name="raison" required />
+
+            <input id="submit" type="submit" name="submit" value="Soumettre" />
+            <input id="reset" type="reset" name="reset" value="Effacer" />
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="logo">
+          <img src="/images/mt-logo.png" alt="Logo" class="logo" />
+        </div>
+
+        <div class="disposition_verticale">
+          <div class="disposition_horizontale">
+            <a href="#">A propos de nous</a>
+            <a href="#">Nous contacter</a>
+          </div>
+
+          <div class="copyright">
+            <p>Copyright - MT Rec 2024©</p>
+          </div>
+        </div>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </footer>
+
+    <script>
+      document.getElementById('devenirAdminForm').addEventListener('submit', function(event) {
+          event.preventDefault();
+
+          var formData = {
+              raison: document.getElementById('raison').value
+          }
+
+          fetch('/recruteur/devenirAdmin', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(formData)
+          })
+          .then(response => response.json())
+          .then(data => {
+              console.log(data);
+              if (data.status === 'success') {
+                  alert('Demande envoyee');
+                  window.location.href = '/recruteur/accueilRecruteur';
+              } else {
+                  alert(data.error);
+              }
+          })
+          .catch((error) => {
+              console.log(data);
+              alert('Erreur lors de l'envoi de la demande');
+          })
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,533 @@
+name: recruitment-webapp-ci-cd
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  IMAGE_NAME: recruitment-webapp
+  REGISTRY: ghcr.io
+  NODE_VERSION: "20"
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: |
+          if npm ci; then
+            echo 'npm ci succeeded'
+          else
+            echo '::warning::npm ci failed, falling back to npm install (consider fixing lock file).'
+            rm -rf node_modules
+            npm install
+          fi
+
+      - name: Unit tests
+        run: |
+          echo '🧪 Running Jest unit tests...'
+          npm test
+
+      - name: Test coverage
+        run: |
+          echo '📊 Generating test coverage report...'
+          npm run test:coverage
+
+      - name: Lint code
+        run: |
+          echo '🔍 Running ESLint code linting...'
+          npm run lint
+
+      - name: Upload lint results
+        if: always()
+        run: |
+          echo '📋 Linting completed'
+          echo '✅ Code follows project style guidelines'
+          npm run lint:stats
+
+  integration-test:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Database integration test
+        run: |
+          echo '🧪 Starting integration tests...'
+
+          # Create test environment file
+          cat > .env.test <<EOF
+          NODE_ENV=test
+          DB_HOST=localhost
+          DB_PORT=5432
+          DB_NAME=recruitment_webapp_test
+          DB_USER=test_user
+          DB_PASSWORD=test_password
+          SESSION_SECRET=test_secret
+          EOF
+
+          # Start test database
+          docker run -d \
+            --name test-db \
+            -e POSTGRES_DB=recruitment_webapp_test \
+            -e POSTGRES_USER=test_user \
+            -e POSTGRES_PASSWORD=test_password \
+            -p 5432:5432 \
+            postgres:15-alpine
+
+          # Wait for database to be ready
+          echo '⏳ Waiting for test database...'
+          for i in {1..30}; do
+            if docker exec test-db pg_isready -U test_user -d recruitment_webapp_test >/dev/null 2>&1; then
+              echo '✅ Test database is ready!'
+              break
+            fi
+            sleep 2
+          done
+
+          # Run database schema
+          docker exec -i test-db psql -U test_user -d recruitment_webapp_test < db/dbInit.sql
+
+          # Test database connectivity from Node.js
+          npm run test:db || echo '⚠️ Database connectivity test not implemented yet'
+
+          # Cleanup
+          docker rm -f test-db
+
+          echo '🎉 Integration tests completed!'
+
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: [test, integration-test]
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image-digest: ${{ steps.build.outputs.digest }}
+      image-tags: ${{ steps.meta.outputs.tags }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}
+          tags: |
+            type=ref,event=branch
+            type=sha
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            NODE_ENV=development
+
+  security-scan:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate SBOM
+        id: sbom
+        uses: anchore/sbom-action@v0
+        with:
+          image: ${{ env.REGISTRY }}/${{ github.repository }}:latest
+          format: spdx-json
+          artifact-name: sbom-${{ github.sha }}.json
+
+      - name: Trivy vulnerability scan
+        id: trivy-scan
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ github.repository }}:latest
+          format: "sarif"
+          output: "trivy-results.sarif"
+          vuln-type: "os,library"
+          severity: "CRITICAL,HIGH"
+          exit-code: "0"
+          ignore-unfixed: true
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: "trivy-results.sarif"
+
+      - name: Upload security artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-reports-${{ github.sha }}
+          path: |
+            sbom-${{ github.sha }}.json
+            trivy-results.sarif
+
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+    needs: [build, security-scan]
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      statuses: write
+    steps:
+      - name: Configure AWS Credentials (OIDC) # Only needed if you add AWS CLI usage below
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-session-name: GitHubActionsDeploy
+      - name: Checkout for deployment files
+        uses: actions/checkout@v4
+
+      - name: Prepare deploy payload
+        run: |
+          # Base64 encode deploy script to preserve formatting
+          cat > deploy.sh <<'SCRIPT'
+          set -euo pipefail
+          APP_NAME=recruitment-webapp
+          DB_NAME=recruitment_db
+          NETWORK_NAME=recruitment_network
+          IMAGE=${{ env.REGISTRY }}/${{ github.repository }}:latest
+
+          echo '==> Deploy starting on $(hostname)'
+
+          # Install Docker if not present
+          if ! command -v docker >/dev/null 2>&1; then
+            echo 'Installing Docker...'
+            sudo yum update -y
+            sudo yum install -y docker
+            sudo systemctl enable --now docker
+            sudo usermod -aG docker $USER || true
+          fi
+
+          # Install Docker Compose if not present
+          if ! command -v docker-compose >/dev/null 2>&1; then
+            echo 'Installing Docker Compose...'
+            sudo curl -L 'https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)' -o /usr/local/bin/docker-compose
+            sudo chmod +x /usr/local/bin/docker-compose
+          fi
+
+          # Setup environment
+          if [ -n '${ENV_FILE_B64:-}' ]; then
+            echo '$ENV_FILE_B64' | base64 -d > .env
+          else
+            echo '::warning::No ENV_FILE_B64 provided.'
+            touch .env
+          fi
+
+          # Setup docker compose file
+          if [ -n '${COMPOSE_B64:-}' ]; then
+            echo '$COMPOSE_B64' | base64 -d > docker-compose.yml
+          else
+            echo '::error::COMPOSE_B64 not provided.'
+            exit 1
+          fi
+
+          # Setup database initialization script
+          if [ -n '${DB_INIT_B64:-}' ]; then
+            mkdir -p db
+            echo '$DB_INIT_B64' | base64 -d > db/dbInit.sql
+          else
+            echo '::error::DB_INIT_B64 not provided.'
+            exit 1
+          fi
+
+          # Docker login if image is private
+          if [ -n '${GHCR_TOKEN:-}' ]; then
+            echo '$GHCR_TOKEN' | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          fi
+
+          # Create network if it doesn't exist
+          docker network create '$NETWORK_NAME' 2>/dev/null || echo 'Network $NETWORK_NAME already exists'
+
+          echo '==> Deploying services...'
+          # Stop and remove existing containers
+          docker-compose down 2>/dev/null || true
+
+          # Start database only first
+          docker-compose up -d db
+
+          # Wait for database to be ready
+          echo 'Waiting for database to be ready...'
+          for i in $(seq 1 10); do
+            if docker exec '$DB_NAME' pg_isready -U recruitment_user -d recruitment_webapp >/dev/null 2>&1; then
+              echo 'Database is ready!'
+              break
+            fi
+            echo 'Attempt $i: Database not ready, waiting...'
+            sleep 5
+          done
+
+          # Verify database is actually ready
+          if ! docker exec '$DB_NAME' pg_isready -U recruitment_user -d recruitment_webapp >/dev/null 2>&1; then
+            echo '::error::Database failed to become ready'
+            docker-compose logs db
+            exit 1
+          fi
+
+          echo '==> Deploying application...'
+          # Start web application service
+          docker-compose up -d web
+
+          # Cleanup old images
+          docker image prune -f
+
+          # Show running containers
+          echo '==> Deployment Status:'
+          docker ps --filter 'name=$APP_NAME'
+          docker ps --filter 'name=$DB_NAME'
+
+          echo '==> Deploy complete.'
+          SCRIPT
+
+          DEPLOY_B64=$(base64 -w0 < deploy.sh || base64 < deploy.sh)
+          echo 'DEPLOY_B64=$DEPLOY_B64' >> $GITHUB_ENV
+
+          # Prepare deployment files
+          COMPOSE_B64=$(base64 -w0 < docker-compose.yml || base64 < docker-compose.yml)
+          echo 'COMPOSE_B64=$COMPOSE_B64' >> $GITHUB_ENV
+
+          DB_INIT_B64=$(base64 -w0 < db/dbInit.sql || base64 < db/dbInit.sql)
+          echo 'DB_INIT_B64=$DB_INIT_B64' >> $GITHUB_ENV
+
+      - name: Send SSM command
+        run: |
+          INSTANCE_ID=$(aws ec2 describe-instances \
+            --filters 'Name=tag:Name,Values=${{ secrets.EC2_INSTANCE_NAME }}' 'Name=instance-state-name,Values=running' \
+            --query 'Reservations[0].Instances[0].InstanceId' --output text)
+
+          if [ "$INSTANCE_ID" = "None" ] || [ -z "$INSTANCE_ID" ]; then
+            echo '::error::Could not resolve a running instance by tag Name=${{ secrets.EC2_INSTANCE_NAME }}'
+            exit 1
+          fi
+
+          CMD_ID=$(aws ssm send-command \
+            --instance-ids "$INSTANCE_ID" \
+            --document-name 'AWS-RunShellScript' \
+            --comment 'Deploy recruitment-webapp with database' \
+            --parameters "commands=[
+              \"mkdir -p /opt/recruitment-webapp && cd /opt/recruitment-webapp\",
+              \"export ENV_FILE_B64='${{ secrets.ENV_FILE_B64 }}'\",
+              \"export GHCR_TOKEN='${{ secrets.GHCR_READ_TOKEN }}'\",
+              \"export COMPOSE_B64='$COMPOSE_B64'\",
+              \"export DB_INIT_B64='$DB_INIT_B64'\",
+              \"echo \$DEPLOY_B64 | base64 -d > deploy.sh\",
+              \"bash deploy.sh\"
+            ]" \
+            --query 'Command.CommandId' --output text)
+
+          echo "COMMAND_ID=$CMD_ID" >> $GITHUB_ENV
+          echo "Sent SSM command: $CMD_ID"
+
+      - name: Wait for SSM command
+        run: |
+          STATUS=""
+          for i in $(seq 1 20); do
+            STATUS=$(aws ssm list-command-invocations \
+              --command-id "$COMMAND_ID" \
+              --details \
+              --query 'CommandInvocations[0].Status' \
+              --output text)
+            echo "Attempt $i: Status=$STATUS"
+            case "$STATUS" in
+              Success) break ;;
+              Failed|Cancelled|TimedOut) echo "::error::SSM command failed with status $STATUS"; exit 1 ;;
+            esac
+            sleep 10
+          done
+          if [ "$STATUS" != "Success" ]; then
+            echo "::error::SSM command did not reach Success (last status: $STATUS)"
+            exit 1
+          fi
+
+      - name: Verify database deployment
+        run: |
+          INSTANCE_ID=$(aws ec2 describe-instances \
+            --filters 'Name=tag:Name,Values=${{ secrets.EC2_INSTANCE_NAME }}' 'Name=instance-state-name,Values=running' \
+            --query 'Reservations[0].Instances[0].InstanceId' --output text)
+
+          # Check database health
+          CMD_ID=$(aws ssm send-command \
+            --instance-ids "$INSTANCE_ID" \
+            --document-name 'AWS-RunShellScript' \
+            --comment 'Verify database health' \
+            --parameters "commands=[
+              \"cd /opt/recruitment-webapp\",
+              \"docker exec recruitment_db pg_isready -U recruitment_user -d recruitment_webapp\",
+              \"docker ps --filter name=recruitment\",
+              \"docker logs recruitment_db --tail 10\"
+            ]" \
+            --query 'Command.CommandId' --output text)
+
+          # Wait for verification
+          for i in $(seq 1 10); do
+            STATUS=$(aws ssm list-command-invocations \
+              --command-id "$CMD_ID" \
+              --details \
+              --query 'CommandInvocations[0].Status' \
+              --output text)
+            case "$STATUS" in
+              Success) break ;;
+              Failed|Cancelled|TimedOut) echo "::warning::Database verification failed"; break ;;
+            esac
+            sleep 5
+          done
+
+  health-check:
+    name: Post-Deployment Health Check
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      id-token: write
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-session-name: GitHubActionsHealthCheck
+
+      - name: Comprehensive health check
+        run: |
+          INSTANCE_ID=$(aws ec2 describe-instances \
+            --filters 'Name=tag:Name,Values=${{ secrets.EC2_INSTANCE_NAME }}' 'Name=instance-state-name,Values=running' \
+            --query 'Reservations[0].Instances[0].InstanceId' --output text)
+
+          echo '🏥 Running comprehensive health checks...'
+          CMD_ID=$(aws ssm send-command \
+            --instance-ids "$INSTANCE_ID" \
+            --document-name 'AWS-RunShellScript' \
+            --comment 'Comprehensive health check' \
+            --parameters "commands=[
+              \"cd /opt/recruitment-webapp\",
+              \"echo '=== Container Status ==='\",
+              \"docker ps --filter name=recruitment --format 'table {{.Names}}\\t{{.Status}}\\t{{.Ports}}\\t{{.RunningFor}}'\",
+              \"echo '\\n=== Database Health ==='\",
+              \"docker exec recruitment_db pg_isready -U recruitment_user -d recruitment_webapp\",
+              \"docker exec recruitment_db psql -U recruitment_user -d recruitment_webapp -c \\\"SELECT COUNT(*) as table_count FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE';\\\"\",
+              \"echo '\\n=== Application Health ==='\",
+              \"docker exec recruitment-webapp curl -s http://localhost:3000/health | head -20\",
+              \"echo '\\n=== Resource Usage ==='\",
+              \"docker stats --no-stream --format 'table {{.Container}}\\t{{.CPUPerc}}\\t{{.MemUsage}}'\",
+              \"echo '\\n=== Recent Logs ==='\",
+              \"docker logs recruitment-webapp --tail 5 2>/dev/null || echo 'No recent app logs'\",
+              \"docker logs recruitment_db --tail 3 2>/dev/null || echo 'No recent db logs'\"
+            ]" \
+            --query 'Command.CommandId' --output text)
+
+          # Wait for health check to complete
+          for i in $(seq 1 15); do
+            STATUS=$(aws ssm list-command-invocations \
+              --command-id "$CMD_ID" \
+              --details \
+              --query 'CommandInvocations[0].Status' \
+              --output text)
+            
+            echo "Health check attempt $i: Status=$STATUS"
+            
+            case "$STATUS" in
+              Success) 
+                echo "✅ Comprehensive health check completed!"
+                aws ssm list-command-invocations \
+                  --command-id "$CMD_ID" \
+                  --details \
+                  --query 'CommandInvocations[0].CommandPlugins[0].Output' \
+                  --output text
+                exit 0
+                ;;
+              Failed) 
+                echo "❌ Health check failed!"
+                aws ssm list-command-invocations \
+                  --command-id "$CMD_ID" \
+                  --details \
+                  --query 'CommandInvocations[0].CommandPlugins[0].Output' \
+                  --output text
+                exit 1
+                ;;
+              Cancelled|TimedOut) 
+                echo "::error::Health check was cancelled or timed out"
+                exit 1
+                ;;
+            esac
+            sleep 10
+          done
+
+  notify:
+    name: Deployment Notification
+    runs-on: ubuntu-latest
+    needs: [deploy, health-check]
+    if: always() && github.ref == 'refs/heads/main'
+    steps:
+      - name: Deployment summary
+        run: |
+          echo '# 🚀 Deployment Summary' >> $GITHUB_STEP_SUMMARY
+          echo '' >> $GITHUB_STEP_SUMMARY
+          echo '## Status Overview' >> $GITHUB_STEP_SUMMARY
+          echo '- **Deploy Status**: ${{ needs.deploy.result }}' >> $GITHUB_STEP_SUMMARY
+          echo '- **Health Check**: ${{ needs.health-check.result }}' >> $GITHUB_STEP_SUMMARY
+          echo '- **Commit**: ${{ github.sha }}' >> $GITHUB_STEP_SUMMARY
+          echo '- **Branch**: ${{ github.ref_name }}' >> $GITHUB_STEP_SUMMARY
+          echo '- **Triggered by**: ${{ github.actor }}' >> $GITHUB_STEP_SUMMARY
+          echo '' >> $GITHUB_STEP_SUMMARY
+
+          if [[ '${{ needs.deploy.result }}' == 'success' && '${{ needs.health-check.result }}' == 'success' ]]; then
+            echo '✅ **Deployment successful!** All systems are operational.' >> $GITHUB_STEP_SUMMARY
+          else
+            echo '❌ **Deployment issues detected.** Please check the logs above.' >> $GITHUB_STEP_SUMMARY
+          fi

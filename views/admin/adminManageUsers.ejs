@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+
+    <title>MT Rec - Gestion des utilisateurs</title>
+    <link rel="stylesheet" href="/stylesheets/accueil.css" />
+    <link rel="stylesheet" href="/stylesheets/formulaires.css" />
+
+    <!--
+    <link rel='stylesheet' href='/stylesheets/connexion.css'>
+    <link rel='stylesheet' href='/stylesheets/general.css'>
+    -->
+  </head>
+
+  <body>
+    <header>
+      <div class="container">
+        <div class="logo">
+          <a href="/admin/accueilAdmin"
+            ><img src="/images/mt-logo.png" alt="Accueil" class="logo"
+          /></a>
+        </div>
+
+        <nav>
+          <a href="/admin/gestionOrganisations">Gérer les organisations</a>
+          <a href="/admin/gestionUtilisateurs">Gérer les utilisateurs</a>
+          <a href="/admin/listeDemandesDevenirRecruteur"
+            >Demandes DevenirRecruteur</a
+          >
+          <a href="/admin/listeDemandesDevenirAdmin">Demandes Devenir Admin</a>
+          <a href="/admin/listeDemandesRejoindreOrg">Demandes Rejoindre Org</a>
+          <a href="/admin/listeDemandesAjoutOrg">Demandes Ajout Org</a>
+          <a href="/admin/monCompteAdmin">Mon compte</a>
+          <a href="/connexion/disconnectUser" class="deconnexion"
+            >Deconnexion</a
+          >
+        </nav>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </header>
+
+    <main class="content">
+      <div>
+        <div class="disposition_verticale">
+          <div
+            class="formulaire"
+            id="updateUtilisateurFormDiv"
+            style="display: none"
+          >
+            <div class="titre-formulaire">
+              <h3>Update User Information</h3>
+            </div>
+
+            <form id="updateUserForm" action="/users/" , method="PUT">
+              Email:
+              <input
+                type="text"
+                id="update_email"
+                name="email"
+                required
+              /><br />
+              <div id="emailWarning" style="display: none"></div>
+
+              Nom:
+              <input type="text" id="update_nom" name="nom" required /><br />
+              <div id="nameWarning" style="display: none"></div>
+
+              Prénom:
+              <input
+                type="text"
+                id="update_prenom"
+                name="prenom"
+                required
+              /><br />
+              <div id="firstNameWarning" style="display: none"></div>
+
+              Téléphone:
+              <input
+                type="tel"
+                id="update_telephone"
+                name="telephone"
+                required
+              /><br />
+              <div id="phoneNumberWarning" style="display: none"></div>
+
+              Type utilisateur:
+              <input
+                type="text"
+                id="update_type_utilisateur"
+                name="userType"
+                required
+              /><br />
+              <div id="userTypeWarning" style="display: none"></div>
+
+              Ancien Mdp:
+              <input
+                type="password"
+                id="old_mdp"
+                name="old_mdp"
+                required
+              /><br />
+
+              Nouveau Mdp:
+              <input
+                type="password"
+                id="update_mdp"
+                name="password"
+                required
+              /><br />
+              <div id="newPasswordWarning" style="display: none"></div>
+
+              Confirmer Nouveau Mdp:
+              <input
+                type="password"
+                id="repeat_update_mdp"
+                name="mdp_repete"
+                required
+              /><br />
+              <div
+                id="newPasswordConfirmationWarning"
+                style="display: none"
+              ></div>
+
+              <center>
+                <br />
+                <ul class="password-requirements" id="password-requirements">
+                  <li id="length" class="invalid">
+                    Le mot de passe doit contenir au moins 12 caractères
+                  </li>
+                  <li id="uppercase" class="invalid">Au moins une majuscule</li>
+                  <li id="lowercase" class="invalid">Au moins une minuscule</li>
+                  <li id="number" class="invalid">Au moins un chiffre</li>
+                  <li id="special" class="invalid">
+                    Au moins un caractère spécial
+                  </li>
+                </ul>
+                <br />
+              </center>
+
+              <input type="submit" value="Soumettre" />
+              <button type="button" onclick="hideUpdateForm()">Annuler</button>
+            </form>
+          </div>
+
+          <% if(users.length > 0) { %>
+          <div class="tableau">
+            <div class="titre-tableau">
+              <h3><%= title %></h3>
+            </div>
+
+            <table border="1">
+              <thead>
+                <th>Id</th>
+                <th>Nom</th>
+                <th>Prenom</th>
+                <th>Email</th>
+                <th>Telephone</th>
+                <th>Type utilisateur</th>
+                <th>Date création</th>
+                <th>statut</th>
+                <th>Organisation</th>
+                <th>Actions</th>
+              </thead>
+
+              <tbody>
+                <% users.forEach(function(user) { %>
+                <tr>
+                  <td><%= user.idUser %></td>
+                  <td><%= user.nom %></td>
+                  <td><%= user.prenom %></td>
+                  <td><%= user.email %></td>
+                  <td><%= user.phoneNumber %></td>
+                  <td><%= user.userType %></td>
+                  <td>
+                    <%= user.accountRegistrationDate.toLocaleDateString('fr-FR')
+                    %>
+                  </td>
+                  <td><%= user.statut %></td>
+                  <td><%= user.idOrganization %></td>
+                  <td>
+                    <button
+                      class="btn btn-outline btn-warning"
+                      onclick="updateUser("
+                      <%="user.email"
+                      %
+                    >
+                      ')'> Modifier
+                    </button>
+                    <button
+                      class="btn btn-outline btn-success"
+                      onclick="deleteUser("
+                      <%="user.email"
+                      %
+                    >
+                      ')'> Supprimer
+                    </button>
+
+                    <!-- <div>Debug: <%= user.userType %></div> -->
+                    <% if (user.userType === 'Candidat') { %>
+                    <button
+                      class="btn btn-outline btn-success"
+                      onclick="rendreRecruteur("
+                      <%="user.email"
+                      %
+                    >
+                      ')'> R. Recruteur
+                    </button>
+                    <% } %> <% if (user.userType !== 'Administrateur') { %>
+                    <button
+                      class="btn btn-outline btn-warning"
+                      onclick="rendreAdmin("
+                      <%="user.email"
+                      %
+                    >
+                      ')'> R. Admin
+                    </button>
+                    <% }else { %>
+                    <button
+                      class="btn btn-outline btn-success"
+                      onclick="enleverAdmin("
+                      <%="user.email"
+                      %
+                    >
+                      ')'> Enlever Admin
+                    </button>
+                    <%} %>
+                  </td>
+                </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+          <% } else { %>
+          <h3>Aucun utilisateur n'a trouvé pour le momeent !</h3>
+          <% } %>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="logo">
+          <img src="/images/mt-logo.png" alt="Logo" class="logo" />
+        </div>
+
+        <div class="disposition_verticale">
+          <div class="disposition_horizontale">
+            <a href="#">A propos de nous</a>
+            <a href="#">Nous contacter</a>
+          </div>
+
+          <div class="copyright">
+            <p>Copyright - MT Rec 2024©</p>
+          </div>
+        </div>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </footer>
+
+    <script>
+
+      // TODO: make a hidden form that appears when the update button is clicked
+      function hideUpdateForm() {
+          document.getElementById('updateUtilisateurFormDiv').style.display = 'none';
+      }
+
+      function deleteUser(email) {
+          if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
+              var formData = {
+                  email : email,
+              };
+
+
+              fetch('/users/' + email, {
+                  method: 'DELETE',
+                  headers: {
+                      'content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(formData)
+              })
+                  .then(response => response.json())
+                  .then(data => {
+                      console.log(data);
+                      if (data.status === 'success') {
+                          alert('Utilisateur supprime !');
+                          // alert(data.message);
+                          window.location.reload();
+                      } else {
+                          alert('Echec de la suppression');
+                          // alert(data.error);
+                          // window.location.reload();
+                      }
+                  })
+                  .catch((error) => {
+                      console.log('Erreur:' + error);
+                      alert(error.message);
+                  });
+          }
+      }
+
+      function updateUser(email) {
+          // window.location.href = '/users/' + email;
+          fetch('/users/' + email, {
+              method: 'GET',
+              headers: {
+                  'content-Type': 'application/json'
+              },
+          })
+          .then(response => response.json())
+          .then(data => {
+              console.log(data);
+
+              if(data.status === 'success') {
+                  var old_email = data.user.email;
+                  var old_name = data.user.nom;
+                  var old_firstname = data.user.prenom;
+                  var old_phone = data.user.phoneNumber;
+                  var old_password = data.user.password;
+                  var old_type_utilisateur = data.user.userType;
+
+                  document.getElementById('update_email').value = old_email;
+                  document.getElementById('update_nom').value = old_name;
+                  document.getElementById('update_prenom').value = old_firstname;
+                  document.getElementById('update_telephone').value = old_phone;
+                  document.getElementById('update_type_utilisateur').value = old_type_utilisateur;
+                  // document.getElementById('update_mdp').value = old_password;
+
+                  // Show the update form
+                  document.getElementById('updateUtilisateurFormDiv').style.display = 'block';
+
+                  document.getElementById('updateUserForm').addEventListener('submit', (event) => {
+                      event.preventDefault(); // prevent default form submission
+
+                      // Collect form data
+                      var formData = {
+                          email: document.getElementById('update_email').value,
+                          nom: document.getElementById('update_nom').value,
+                          prenom: document.getElementById('update_prenom').value,
+                          telephone: document.getElementById('update_telephone').value,
+                          userType: document.getElementById('update_type_utilisateur').value,
+                          password: document.getElementById('update_mdp').value
+                      };
+
+                      fetch('/users/', {
+                          method: 'PUT',
+                          headers: {
+                              'content-Type': 'application/json'
+                          },
+                          body: JSON.stringify(formData),
+                      })
+                          .then(response => response.json())
+                          .then(data => {
+                              console.log(data);
+
+                              if(data.status === 'success') {
+                                  alert('Utilisateur mis a jour !');
+                                  //alert(data.message);
+
+                                  // Cacher le formulaire de mise a jour
+                                  document.getElementById('updateUtilisateurFormDiv').style.display = 'none';
+
+                                  // Recharger la page pour refléter la modification
+                                  window.location.reload();
+                              } else {
+                                  console.log('Erreur:' + data);
+
+                                  alert('Erreur survenue lors de la mise a jour de l\'utilisateur');
+                                  //alert(data.error);
+                              }
+                          })
+                          .catch((error) => {
+                              console.log('Erreur:' + error);
+                              alert('An error occurred while updating the user.');
+                          });
+                  });
+
+              } else  {
+                  console.log('Erreur:' + data);
+
+                  alert('Erreur survenue lors de la lecture de l\'utilisateur');
+                  // alert(data.error);
+              }
+
+          })
+          .catch((error) => {
+              console.log('Erreur:' + error);
+              alert(error.message);
+          });
+      }
+
+      function rendreRecruteur(email) {
+          var formData = {
+              email : email,
+          };
+
+          fetch('/users/rendreRecruteur/' + email, {
+              method: 'PUT',
+              headers: {
+                  'content-Type': 'application/json'
+              },
+              body: JSON.stringify(formData)
+          })
+              .then(response => response.json())
+              .then(data => {
+                  console.log(data);
+                  if (data.status === 'success') {
+                      alert(data.message);
+                      window.location.reload();
+                  }
+              })
+              .catch((error) => {
+                  console.log('Erreur:' + error);
+                  alert(error.message);
+              });
+      }
+
+      function rendreAdmin(email) {
+          var formData = {
+              email : email,
+          };
+
+          fetch('/users/rendreAdmin/' + email, {
+              method: 'PUT',
+              headers: {
+                  'content-Type': 'application/json'
+              },
+              body: JSON.stringify(formData)
+          })
+              .then(response => response.json())
+              .then(data => {
+                  console.log(data);
+                  if (data.status === 'success') {
+                      alert(data.message);
+                      window.location.reload();
+                  }
+              })
+              .catch((error) => {
+                  console.log('Erreur:' + error);
+                  alert(error.message);
+              });
+      }
+
+      function enleverAdmin(email) {
+          var formData = {
+              email : email,
+          };
+
+          fetch('/users/enleverAdmin/' + email, {
+              method: 'PUT',
+              headers: {
+                  'content-Type': 'application/json'
+              },
+              body: JSON.stringify(formData)
+          })
+              .then(response => response.json())
+              .then(data => {
+                  console.log(data);
+                  if (data.status === 'success') {
+                      alert(data.message);
+                      window.location.reload();
+                  }
+              })
+              .catch((error) => {
+                  console.log('Erreur:' + error);
+                  alert(error.message);
+              });
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+          const emailInput = document.getElementById('update_email');
+          const nameInput = document.getElementById('update_nom');
+          const firstNameInput = document.getElementById('update_prenom');
+          const phoneNumberInput = document.getElementById('update_telephone');
+          const passwordInput = document.getElementById('update_mdp');
+          const passwordRepeatInput = document.getElementById('repeat_update_mdp');
+          let allValid = true;
+
+          document.getElementById('updateUserForm').addEventListener('input', function(event) {
+              const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+              const email = document.getElementById('update_email').value;
+              const phoneNumber = document.getElementById('update_telephone').value;
+              const password = document.getElementById('update_mdp').value;
+              const passwordRepeat = document.getElementById('repeat_update_mdp').value;
+
+              // Check email
+              if(emailRegex.test(document.getElementById('update_email').value)) {
+                  emailInput.style.borderColor = 'green';
+              } else {
+                  allValid = false;
+                  emailInput.style.borderColor = 'red';
+                  document.getElementById('emailWarning').style.display = 'block';
+                  document.getElementById('emailWarning').textContent = 'Veuillez entrer une adresse email valide. ex: user@example.org';
+              };
+
+              // Check name
+              if(document.getElementById('update_nom').value.length > 0) {
+                  nameInput.style.borderColor = 'green';
+              } else {
+                  allValid = false;
+                  nameInput.style.borderColor = 'red';
+                  document.getElementById('nameWarning').style.display = 'block';
+                  document.getElementById('nameWarning').textContent = 'Veuillez entrer un nom valide. ex: Ibaka';
+              }
+
+              // Check first name
+              if(document.getElementById('update_prenom').value.length > 0) {
+                  firstNameInput.style.borderColor = 'green';
+              } else {
+                  allValid = false;
+                  firstNameInput.style.borderColor = 'red';
+                  document.getElementById('firstNameWarning').style.display = 'block';
+                  document.getElementById('firstNameWarning').textContent = 'Veuillez entrer un prénom valide. ex: Abouchou';
+              }
+
+              // Check phone number
+              if(phoneNumber.length === 10) {
+                  phoneNumberInput.style.borderColor = 'green';
+              } else {
+                  phoneNumberInput.style.borderColor = 'red';
+                  allValid = false;
+                  document.getElementById('phoneNumberWarning').style.display = 'block';
+                  document.getElementById('phoneNumberWarning').textContent = '10 chiffres';
+              }
+
+              // Check password
+              document.getElementById('update_mdp').addEventListener('input', function() {
+                  let passwordValid = true;
+
+                  const requirements = {
+                      length: {
+                          regex: /.{12,}/,
+                          element: document.getElementById('length')
+                      },
+                      uppercase: {
+                          regex: /[A-Z]/,
+                          element: document.getElementById('uppercase')
+                      },
+                      lowercase: {
+                          regex: /[a-z]/,
+                          element: document.getElementById('lowercase')
+                      },
+                      number: {
+                          regex: /[0-9]/,
+                          element: document.getElementById('number')
+                      },
+                      special: {
+                          regex: /[!@#$%^&*(),.?':{}|<>]/,
+                          element: document.getElementById('special')
+                      }
+                  };
+
+                  for (const key in requirements) {
+                      if (requirements[key].regex.test(document.getElementById('update_mdp').value)) {
+                          requirements[key].element.classList.remove('invalid');
+                          requirements[key].element.classList.add('valid');
+                      } else {
+                          requirements[key].element.classList.remove('valid');
+                          requirements[key].element.classList.add('invalid');
+                          passwordValid = false;
+                      }
+                  }
+
+                  if (document.getElementById('update_mdp').value === '') {
+                      for (const key in requirements) {
+                          requirements[key].element.classList.remove('valid');
+                          requirements[key].element.classList.remove('invalid');
+                          passwordValid = false;
+                      }
+                  }
+
+                  if (passwordValid) {
+                      passwordInput.style.borderColor = 'green';
+                  } else {
+                      allValid = false;
+                      passwordInput.style.borderColor = 'red';
+                  }
+
+                  if(document.getElementById('update_type_utilisateur').value !== 'Administrateur' && document.getElementById('update_type_utilisateur').value !== 'Recruteur' && document.getElementById('update_type_utilisateur').value !== 'Candidat') {
+                      document.getElementById('update_type_utilisateur').style.borderColor = 'red';
+                      allValid = false;
+                      document.getElementById('userTypeWarning').style.display = 'block';
+                      document.getElementById('userTypeWarning').textContent = 'Administrateur, Recruteur ou Candidat';
+                  } else {
+                      document.getElementById('update_type_utilisateur').style.borderColor = 'green';
+                  }
+
+              });
+
+              document.getElementById('repeat_update_mdp').addEventListener('input', function() {
+                  if (document.getElementById('update_mdp').value === document.getElementById('repeat_update_mdp').value) {
+                      passwordRepeatInput.style.borderColor = 'green'; // Highlight in green if matching
+                  } else {
+                      allValid = false;
+                      passwordRepeatInput.style.borderColor = 'red'; // Highlight in red if not matching
+                      document.getElementById('newPasswordConfirmationWarning').style.display = 'block';
+                      document.getElementById('newPasswordConfirmationWarning').textContent = 'Les mots de passe ne correspondent pas';
+                  }
+              });
+
+          });
+
+          console.log(allValid);
+           // Empecher la soumission du formulaire tantque tous les champs ne sont pas valides
+           document.querySelector('input[type='submit']').disabled = !allValid;
+
+      });
+    </script>
+  </body>
+</html>

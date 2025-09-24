@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>MT Rec - Liste des organisations</title>
+    <link rel="stylesheet" href="/stylesheets/accueil.css" />
+
+    <!--
+    <link rel='stylesheet' href='/stylesheets/connexion.css'>
+    <link rel='stylesheet' href='/stylesheets/formulaires.css'>
+    <link rel='stylesheet' href='/stylesheetsets/general.css'>
+    -->
+  </head>
+
+  <body>
+    <header>
+      <div class="container">
+        <div class="logo">
+          <a href="/admin/accueilAdmin"
+            ><img src="/images/mt-logo.png" alt="Accueil" class="logo"
+          /></a>
+        </div>
+
+        <nav>
+          <a href="/admin/gestionOrganisations">Gérer les organisations</a>
+          <a href="/admin/gestionUtilisateurs">Gérer les utilisateurs</a>
+          <a href="/admin/listeDemandesDevenirRecruteur"
+            >Demandes DevenirRecruteur</a
+          >
+          <a href="/admin/listeDemandesDevenirAdmin">Demandes Devenir Admin</a>
+          <a href="/admin/listeDemandesRejoindreOrg">Demandes Rejoindre Org</a>
+          <a href="/admin/listeDemandesAjoutOrg">Demandes Ajout Org</a>
+          <a href="/admin/monCompteAdmin">Mon compte</a>
+          <a href="/connexion/disconnectUser" class="deconnexion"
+            >Deconnexion</a
+          >
+        </nav>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </header>
+
+    <main class="content">
+      <div>
+        <div class="disposition_verticale">
+          <% if (organisations.length > 0) { %>
+          <div class="tableau">
+            <div class="titre-tableau">
+              <h3><%= title %></h3>
+            </div>
+
+            <table border>
+              <thead>
+                <tr>
+                  <th>siren</th>
+                  <th>Nom</th>
+                  <th>Siege Social</th>
+                  <th>Type Assos</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% organisations.forEach((org)=> { %>
+                <tr>
+                  <td><%= org.siren %></td>
+                  <td><%= org.nom %></td>
+                  <td><%= org.hqOrg %></td>
+                  <td><%= org.type_assos %></td>
+                </tr>
+                <% } ) %>
+              </tbody>
+            </table>
+          </div>
+          <% } else { %>
+          <h3>Aucune organisation trouvée</h3>
+          <% } %>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="logo">
+          <img src="/images/mt-logo.png" alt="Logo" class="logo" />
+        </div>
+
+        <div class="disposition_verticale">
+          <div class="disposition_horizontale">
+            <a href="#">A propos de nous</a>
+            <a href="#">Nous contacter</a>
+          </div>
+
+          <div class="copyright">
+            <p>Copyright - MT Rec 2024©</p>
+          </div>
+        </div>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </footer>
+  </body>
+</html>

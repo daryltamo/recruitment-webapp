@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang='fr'>
+
+<head>
+    <meta charset='utf-8'>
+    <title>MT Rec - Offres d'emploi</title>
+    <link rel='stylesheet' href='/stylesheets/accueil.css'>
+    <link rel='stylesheet' href='/stylesheets/formulaires.css'>
+    
+    <!-- 
+    <link rel='stylesheet' href='/stylesheets/connexion.css'>
+    <link rel='stylesheet' href='/stylesheets/general.css'>
+    -->
+</head>
+
+<body>
+
+    <header>
+        <div class='container'>
+            <div class='logo'>
+                <img src='/images/mt-logo.png' alt='Logo' class='logo'>
+            </div>
+        
+            <nav>
+                <a href='#'>Link 1</a>
+                <a href='#'>link 2</a>
+                <a href='#'>link 3</a>
+                <a href='#'>link 4</a>
+                <a href='/connexion/disconnectUser' class='deconnexion'>Deconnexion</a>
+            </nav>
+        </div>
+        <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </header>
+
+
+    <main class='content'>
+        <div>
+
+            <div class='disposition_verticale'>
+
+                <div class='tableau'>
+
+                    <div class='titre-tableau'>
+                        <h3> <%= title %> </h3>
+                    </div>
+
+                    <table border>
+
+                        <thead>
+                            <tr>
+                                <th>Numero de l'offre</th>
+                                <th>Date de fin de validité</th>
+                                <th>Indication</th>
+                                <th>Documents requis</th>
+                                <th>Etat</th> 
+                                <th>Recruteur</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% offresDemploi.forEach((offer)=> { %>
+                                <tr>
+                                    <td>
+                                        <%= offer.num %>
+                                    </td>
+                                    <td>
+                                        <%= offer.expirationDate.toLocaleDateString('fr-FR') %>
+                                    </td>
+                                    <td>
+                                        <%= offer.indication %>
+                                    </td>
+                                    <td>
+                                        <%= offer.numberOfRequiredDocuments %>
+                                    </td>
+                                    <td>
+                                        <%= offer.state %>
+                                    </td>
+                                    <td>
+                                        <%= offer.idRecruiter %>
+                                    </td>
+                                </tr>
+                            <% } ) %>
+                        </tbody>
+
+                    </table>
+
+                </div>
+            
+                <div class='formulaire'>
+
+                    <div class='titre-formulaire'>
+                        <h3>Formulaire de création d'une offre d'emploi</h3>
+                    </div>
+
+                    <form action='/offreDemploi/addOffer' method='post' id='offreDemploiForm'>
+                        <label for='Numéro de l'offre'>Numéro de l'offre:</label>
+                        <input type='text' id='offerNumber' name='offerNumber' required><br>
+                
+                        <label for='Date de fin de validité'>Date de fin de validité:</label>
+                        <input type='date' id='expirationDate' name='expirationDate' required><br>
+                        
+                        <label for='Indication'>Indication:</label>
+                        <input type='text' id='indication' name='indication' required><br>
+                        
+                        <label for='Documents requis'>Documents requis:</label>
+                        <input type='text' id='numberOfRequiredDocuments' name='numberOfRequiredDocuments' required><br>
+                        
+                        <label for='Etat'>Etat:</label>
+                        <input type='text' id='state' name='state' required><br>
+                
+                        <label for='Recruteur'>Recruteur:</label>
+                        <input type='text' id='recruteur' name='recruteur' required><br>
+                        
+                        <input type='submit' value='Soumettre'>
+                        <input type='reset' value='Effacer'>
+                    </form>
+                    
+                </div>
+                
+            </div>
+            
+        </div>
+    </main>
+
+
+    <footer>
+        <div class='container'>
+            <div class='logo'>
+                <img src='/images/mt-logo.png' alt='Logo' class='logo'>
+            </div>
+
+            <div class='disposition_verticale'>
+                
+                <div class='disposition_horizontale'>
+                    <a href='#'>A propos de nous</a>
+                    <a href='#'>Nous contacter</a>
+                </div>
+
+                <div class='copyright'>
+                    <p>Copyright - MT Rec 2024©</p>
+                </div>
+
+            </div>
+            
+        </div>
+        <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    
+    </footer>
+
+
+    <script>
+        document.getElementById('offreDemploiForm').addEventListener('submit', function (event) {
+            event.preventDefault();  // Empêcher la soumission normale du formulaire
+
+            // Récupérer les valeurs du formulaire
+            var formData = {
+                offerNumber: document.getElementById('offerNumber').value, // TODO: auto-generate this value
+                expirationDate: document.getElementById('expirationDate').value,
+                indication: document.getElementById('indication').value,
+                numberOfRequiredDocuments: document.getElementById('numberOfRequiredDocuments').value,
+                state: document.getElementById('state').value,
+                recruteur: document.getElementById('recruteur').value,
+            };
+
+            // Envoi des données du formulaire en utilisant fetch API
+            fetch('/offreDemploi/addoffer', {
+                method: 'POST',
+                headers: {
+                    'content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    alert('offre d\'emploi enregistree avec succès!');
+                    window.location.href = '/offreDemploi';
+
+                })
+                .catch((error) => {
+                    console.log('Error:', error);
+                    alert('Erreur lors de l\'enregistrement de l\'offre d\'emploi.');
+                });
+        });
+    </script>
+
+</body>
+
+</html>
+

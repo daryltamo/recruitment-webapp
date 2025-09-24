@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+
+    <title>MT Rec - Creation d'une fiche de poste</title>
+    <link rel="stylesheet" href="/stylesheets/accueil.css" />
+    <link rel="stylesheet" href="/stylesheets/formulaires.css" />
+    <!--
+    <link rel='stylesheet' href='/stylesheets/connexion.css'>
+    <link rel='stylesheet' href='/stylesheets/formulaires.css'>
+    <link rel='stylesheet' href='/stylesheets/general.css'>
+    -->
+  </head>
+
+  <body>
+    <header>
+      <div class="container">
+        <div class="logo">
+          <a href="/recruteur/accueilRecruteur"
+            ><img src="/images/mt-logo.png" alt="Accueil" class="logo"
+          /></a>
+        </div>
+
+        <nav>
+          <a href="/recruteur/gestionOffresRecruteur/"
+            >Gérer vos offres d'emploi</a
+          >
+          <a href="/recruteur/gestionFichesDePoste"
+            >Gérer vos fiches de postes</a
+          >
+          <a href="/recruteur/demandeRejoindreOrg"
+            >Rejoindre une organisation</a
+          >
+          <a href="/recruteur/monCompteRecruteur">Mon compte</a>
+          <a href="/connexion/disconnectUser" class="deconnexion"
+            >Deconnexion</a
+          >
+        </nav>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </header>
+
+    <main class="content">
+      <div>
+        <div class="formulaire">
+          <div class="titre-formulaire">
+            <h3>Création d'une fiche de poste</h3>
+          </div>
+
+          <form
+            id="addFicheDePosteForm"
+            action="/recruteur/creationFicheDePoste/addFicheDePoste"
+            method="post"
+          >
+            <label for="jobTitle">Intitulé : </label>
+            <input type="text" id="jobTitle" name="jobTitle" required />
+
+            <label for="statut_poste">Statut du poste : </label>
+            <input type="text" id="statut_poste" name="statut_poste" required />
+
+            <label for="resp_hierarch">Responsable hiérarchique : </label>
+            <input
+              type="text"
+              id="resp_hierarch"
+              name="resp_hierarch"
+              required
+            />
+
+            <label for="jobType">Type de métier : </label>
+            <input type="text" id="jobType" name="jobType" required />
+
+            <label for="jobLocation">Lieu mission : </label>
+            <input type="text" id="jobLocation" name="jobLocation" required />
+
+            <label for="rythme">Rythme : </label>
+            <input type="text" id="rythme" name="rythme" required />
+
+            <label for="salary">salary (brut) : </label>
+            <input type="text" id="salary" name="salary" required />
+
+            <label for="description">Description : </label>
+            <input type="text" id="description" name="description" required />
+
+            <input type="submit" id="submit" name="submit" value="Créer" />
+            <input type="reset" id="reset" name="reset" value="Effacer" />
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="logo">
+          <img src="/images/mt-logo.png" alt="Logo" class="logo" />
+        </div>
+
+        <div class="disposition_verticale">
+          <div class="disposition_horizontale">
+            <a href="#">A propos de nous</a>
+            <a href="#">Nous contacter</a>
+          </div>
+
+          <div class="copyright">
+            <p>Copyright - MT Rec 2024©</p>
+          </div>
+        </div>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </footer>
+
+    <script>
+      document
+        .getElementById("addFicheDePosteForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault(); // empecher la soumission normale du formulaire
+
+          var formData = {
+            jobTitle: document.getElementById("jobTitle").value,
+            statut_poste: document.getElementById("statut_poste").value,
+            resp_hierarch: document.getElementById("resp_hierarch").value,
+            jobType: document.getElementById("jobType").value,
+            jobLocation: document.getElementById("jobLocation").value,
+            rythme: document.getElementById("rythme").value,
+            salary: document.getElementById("salary").value,
+            description: document.getElementById("description").value,
+          };
+
+          fetch("/recruteur/creationFicheDePoste/addFicheDePoste", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log(data);
+              if (data.status === "success") {
+                alert("Fiche de poste créée avec succès");
+                window.location.href = "/recruteur/gestionFichesDePoste";
+              } else {
+                alert(
+                  "Erreur survenue lors de la création de la fiche de poste"
+                );
+                // window.location.href = '/recruteur/gestionFichesDePoste';
+              }
+            })
+            .catch((error) => {
+              console.error("Erreur: ", error);
+              alert("Erreur survenue lors de la création de la fiche de poste");
+              // window.location.href = '/recruteur/gestionFichesDePoste';
+            });
+        });
+    </script>
+  </body>
+</html>

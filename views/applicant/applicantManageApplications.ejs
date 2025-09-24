@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+
+    <title>MT Rec - Gérer vos candidatures</title>
+    <link rel="stylesheet" href="/stylesheets/accueil.css" />
+    <!--
+    <link rel='stylesheet' href='/stylesheets/connexion.css'>
+    <link rel='stylesheet' href='/stylesheets/formulaires.css'>
+    <link rel='stylesheet' href='/stylesheets/general.css'>
+    -->
+  </head>
+
+  <body>
+    <header>
+      <div class="container">
+        <div class="logo">
+          <a href="/candidat/accueilCandidat"
+            ><img src="/images/mt-logo.png" alt="Accueil" class="logo"
+          /></a>
+        </div>
+
+        <nav>
+          <!-- <a href='/candidat/listeOffres'>Liste des offres</a> -->
+          <a href="/candidat/gestionDesCandidaturesCandidat"
+            >Gérer mes candidatures</a
+          >
+          <a href="/candidat/devenirRecruteur">Devenir recruteur</a>
+          <a href="/candidat/monCompteCandidat">Mon compte</a>
+          <a href="/connexion/disconnectUser" class="deconnexion"
+            >Deconnexion</a
+          >
+        </nav>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </header>
+
+    <main class="content">
+      <div>
+        <div class="disposition_verticale">
+          <div class="tableau">
+            <div class="titre-tableau">
+              <h1 class="table-title"><b> Candidature à l'offre </b></h1>
+            </div>
+
+            <table class="table" border="1">
+              <thead>
+                <tr>
+                  <th>Organisation</th>
+                  <th>Intitulé de l'Offre</th>
+                  <th>Statut</th>
+                  <th>Date de Candidature</th>
+                  <th>Date de Validité</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <% candidatures.forEach(function(candidature) { %>
+                <tr>
+                  <td><%= candidature.idJobOffer %></td>
+                  <td><%= candidature.jobTitle %></td>
+                  <td><%= candidature.statut_candidature %></td>
+                  <td>
+                    <%= candidature.applicationDate.toLocaleDateString('fr-FR')
+                    %>
+                  </td>
+                  <td>
+                    <%= candidature.expirationDate.toLocaleDateString('fr-FR')
+                    %>
+                  </td>
+
+                  <% if (candidature.statut_candidature === 'En attente' ) { %>
+                  <td>
+                    <button
+                      class="btn btn-outline btn-warning"
+                      onclick="modifierCandidature("
+                      <%="candidature.idApplicant%"
+                    >
+                      ', '<%=candidature.idJobOffer%>')'>Modifier
+                    </button>
+                    <button
+                      class="btn btn-outline btn-warning"
+                      onclick="supprimerCandidature("
+                      <%="candidature.idApplicant%"
+                    >
+                      ', '<%=candidature.idJobOffer%>')'>Supprimer
+                    </button>
+                  </td>
+                  <% } %>
+                </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+
+          <div
+            class="formulaire"
+            id="updateCandidatureFormDiv"
+            style="display: none"
+          >
+            <div class="titre-formulaire">
+              <h3>Formulaire de mise à jour d'une candidature</h3>
+            </div>
+
+            <form
+              id="updateApplicationForm"
+              action="/candidat/candidatureAUneOffre/upload?offerNumber=<%=candidatures.idJobOffer%>"
+              method="PUT"
+              enctype="multipart/form-data"
+            >
+              <label for="cv">CV:</label>
+              <input type="file" id="cv" name="cv" accept=".pdf,.doc,.docx" />
+
+              <label for="lettre_motivation">LM:</label>
+              <input
+                type="file"
+                id="lettre_motivation"
+                name="lettre_motivation"
+                accept=".pdf,.doc,.docx"
+              />
+
+              <label for="autre_document"
+                >Autre document supplémentaire : (Facultatif)</label
+              >
+              <input
+                type="file"
+                id="autre_document"
+                name="autre_document"
+                accept=".pdf,.doc,.docx"
+              /><br /><br />
+
+              <input
+                id="submit"
+                type="submit"
+                name="submit"
+                value="Soumettre"
+              />
+              <button id="reset" type="button" onclick="hideUpdateForm()">
+                Annuler
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="logo">
+          <img src="/images/mt-logo.png" alt="Logo" class="logo" />
+        </div>
+
+        <div class="disposition_verticale">
+          <div class="disposition_horizontale">
+            <a href="#">A propos de nous</a>
+            <a href="#">Nous contacter</a>
+          </div>
+
+          <div class="copyright">
+            <p>Copyright - MT Rec 2024©</p>
+          </div>
+        </div>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </footer>
+
+    <script>
+      function hideUpdateForm() {
+        document.getElementById("updateCandidatureFormDiv").style.display =
+          "none";
+      }
+
+      function modifierCandidature(idApplicant, idJobOffer) {
+        document.getElementById("updateCandidatureFormDiv").style.display =
+          "block";
+
+        document
+          .getElementById("updateApplicationForm")
+          .addEventListener("submit", function (event) {
+            event.preventDefault(); // Empêcher le formulaire de soumettre les données
+
+            // Récuperer les données du formulaire
+            var formData = new FormData(
+              document.getElementById("updateApplicationForm")
+            );
+
+            fetch(
+              "/candidat/gestionDesCandidaturesCandidat/upload?offerNumber=",
+              {
+                method: "PUT",
+                body: formData,
+              }
+            )
+              .then((response) => response.json())
+              .then((data) => {
+                console.log(data);
+                if (data.status === "success") {
+                  alert(data.message);
+                  window.location.reload();
+                } else {
+                  alert(data.error);
+                }
+              })
+              .catch((error) => {
+                console.error(error);
+
+                alert("Erreur lors de la soumission de la candidature");
+              });
+          });
+      }
+
+      async function supprimerCandidature(idApplicant, idJobOffer) {
+        var formData = {
+          idApplicant: idApplicant,
+          idJobOffer: idJobOffer,
+        };
+
+        try {
+          const reponse = await fetch(
+            "/candidat/gestionDesCandidaturesCandidat/" + idJobOffer,
+            {
+              method: "DELETE",
+              body: JSON.stringify(formData),
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          const resultat = await reponse.json();
+
+          console.log(resultat.status);
+
+          if (resultat.status === "success") {
+            alert("Candidature supprimée");
+            window.location.href = "/candidat/gestionDesCandidaturesCandidat";
+          } else {
+            alert("Error suppression candidature");
+          }
+        } catch (erreur) {
+          console.error("Erreur :", erreur);
+        }
+      }
+    </script>
+  </body>
+</html>

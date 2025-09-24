@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>MT Rec - Inscription</title>
+    <link rel="stylesheet" href="stylesheets/accueil.css" />
+    <link rel="stylesheet" href="stylesheets/formulaires.css" />
+
+    <!-- 
+<link rel='stylesheet' href='stylesheets/connexion.css'>
+<link rel='stylesheet' href='stylesheets/general.css'>
+-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+  </head>
+
+  <body>
+    <header>
+      <div class="container">
+        <div class="logo">
+          <img src="/images/mt-logo.png" alt="Logo" class="logo" />
+        </div>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </header>
+
+    <main class="content">
+      <div>
+        <div class="disposition_horizontale">
+          <div class="formulaire">
+            <h2>Inscription</h2>
+            <form id="inscriptionForm">
+              <label for="email">E-mail</label>
+              <input type="email" id="email" name="email" required />
+
+              <label for="nom">Nom</label>
+              <input type="text" id="nom" name="nom" required />
+
+              <label for="prenom">Prénom</label>
+              <input type="text" id="prenom" name="prenom" required />
+
+              <label for="telephone">Téléphone</label>
+              <input type="tel" id="telephone" name="telephone" required />
+
+              <label for="password">Mot de passe</label>
+              <input type="password" id="password" name="password" required />
+
+              <label for="mdp_repete">Mot de passe à nouveau</label>
+              <input
+                type="password"
+                id="mdp_repete"
+                name="mdp_repete"
+                required
+              />
+
+              <center>
+                <br />
+                <ul class="password-requirements" id="password-requirements">
+                  <li id="length" class="invalid">
+                    Le mot de passe doit contenir au moins 12 caractères
+                  </li>
+                  <li id="uppercase" class="invalid">Au moins une majuscule</li>
+                  <li id="lowercase" class="invalid">Au moins une minuscule</li>
+                  <li id="number" class="invalid">Au moins un chiffre</li>
+                  <li id="special" class="invalid">
+                    Au moins un caractère spécial
+                  </li>
+                </ul>
+                <br />
+              </center>
+
+              <input type='submit' onclick='postJSON()' value='S'inscrire'>
+              <input type="reset" value="Effacer" />
+            </form>
+
+            <a href="/connexion"> Déjà inscris ? Connecte toi ici !</a>
+          </div>
+
+          <div class="img_presentation">
+            <img
+              src="/images/bureau_connexion.png"
+              alt="Bureau"
+              class="img_presentation"
+            />
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="logo">
+          <img src="/images/mt-logo.png" alt="Logo" class="logo" />
+        </div>
+
+        <div class="disposition_verticale">
+          <div class="disposition_horizontale">
+            <a href="#">A propos de nous</a>
+            <a href="#">Nous contacter</a>
+          </div>
+
+          <div class="copyright">
+            <p>Copyright - MT Rec 2024©</p>
+          </div>
+        </div>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </footer>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const emailInput = document.getElementById("email");
+        const nameInput = document.getElementById("nom");
+        const firstNameInput = document.getElementById("prenom");
+        const phoneNumberInput = document.getElementById("telephone");
+        const passwordInput = document.getElementById("password");
+        const passwordRepeatInput = document.getElementById("mdp_repete");
+        let allValid = true;
+
+        document
+          .getElementById("inscriptionForm")
+          .addEventListener("input", function (event) {
+            const emailRegex =
+              /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+            const email = document.getElementById("email").value;
+            const phoneNumber = document.getElementById("telephone").value;
+            const password = document.getElementById("password").value;
+            const passwordRepeat = document.getElementById("mdp_repete").value;
+
+            // Check email
+            if (emailRegex.test(document.getElementById("email").value)) {
+              emailInput.style.borderColor = "green";
+            } else {
+              allValid = false;
+              emailInput.style.borderColor = "red";
+            }
+
+            // Check name
+            if (document.getElementById("nom").value.length > 0) {
+              nameInput.style.borderColor = "green";
+            } else {
+              allValid = false;
+              nameInput.style.borderColor = "red";
+            }
+
+            // Check first name
+            if (document.getElementById("prenom").value.length > 0) {
+              firstNameInput.style.borderColor = "green";
+            } else {
+              allValid = false;
+              firstNameInput.style.borderColor = "red";
+            }
+
+            // Check phone number
+            if (phoneNumber.length === 10) {
+              phoneNumberInput.style.borderColor = "green";
+            } else {
+              allValid = false;
+              phoneNumberInput.style.borderColor = "red";
+            }
+
+            // Check password
+            document
+              .getElementById("password")
+              .addEventListener("input", function () {
+                let passwordValid = true;
+
+                const requirements = {
+                  length: {
+                    regex: /.{12,}/,
+                    element: document.getElementById("length"),
+                  },
+                  uppercase: {
+                    regex: /[A-Z]/,
+                    element: document.getElementById("uppercase"),
+                  },
+                  lowercase: {
+                    regex: /[a-z]/,
+                    element: document.getElementById("lowercase"),
+                  },
+                  number: {
+                    regex: /[0-9]/,
+                    element: document.getElementById("number"),
+                  },
+                  special: {
+                    regex: /[!@#$%^&*(),.?':{}|<>]/,
+                    element: document.getElementById("special"),
+                  },
+                };
+
+                for (const key in requirements) {
+                  if (
+                    requirements[key].regex.test(
+                      document.getElementById("password").value
+                    )
+                  ) {
+                    requirements[key].element.classList.remove("invalid");
+                    requirements[key].element.classList.add("valid");
+                  } else {
+                    requirements[key].element.classList.remove("valid");
+                    requirements[key].element.classList.add("invalid");
+                    passwordValid = false;
+                  }
+                }
+
+                if (document.getElementById("password").value === "") {
+                  for (const key in requirements) {
+                    requirements[key].element.classList.remove("valid");
+                    requirements[key].element.classList.remove("invalid");
+                    passwordValid = false;
+                  }
+                }
+
+                if (passwordValid) {
+                  passwordInput.style.borderColor = "green";
+                } else {
+                  allValid = false;
+                  passwordInput.style.borderColor = "red";
+                }
+              });
+
+            document
+              .getElementById("mdp_repete")
+              .addEventListener("input", function () {
+                if (
+                  document.getElementById("password").value ===
+                  document.getElementById("mdp_repete").value
+                ) {
+                  passwordRepeatInput.style.borderColor = "green"; // Highlight in green if matching
+                } else {
+                  allValid = false;
+                  passwordRepeatInput.style.borderColor = "red"; // Highlight in red if not matching
+                }
+              });
+          });
+      });
+      // Récupérer les valeurs du formulaire
+      async function postJSON() {
+        const reponse = await hashPassword();
+
+        var donnees = {
+          email: document.getElementById("email").value,
+          nom: document.getElementById("nom").value,
+          prenom: document.getElementById("prenom").value,
+          telephone: document.getElementById("telephone").value,
+          password: document.getElementById("password").value,
+          mdp_repete: document.getElementById("mdp_repete").value,
+        };
+
+        try {
+          const reponse = await fetch("/users/adduser", {
+            method: "POST", // ou 'PUT'
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(donnees),
+          });
+
+          const resultat = await reponse.json();
+          if (resultat.status === "success") {
+            window.location.href = "/connexion";
+          } else if (resultat.status === "email") {
+            alert("Erreur : email déjà utilisé");
+          } else {
+            alert("Erreur : mot de passe incorrect");
+          }
+        } catch (erreur) {
+          console.error("Erreur :", erreur);
+        }
+      }
+
+      async function hashPassword() {
+        return new Promise((resolve, reject) => {
+          var champMdp = document.getElementById("password");
+          var champMdpRepete = document.getElementById("mdp_repete");
+
+          // Vérifie que les mots de passe correspondent
+          if (champMdp.value !== champMdpRepete.value) {
+            alert("Les mots de passe ne correspondent pas.");
+            return false;
+          }
+
+          // Hash le mot de passe
+          var hashedMdp = CryptoJS.SHA224(champMdp.value).toString();
+
+          champMdp.value = hashedMdp;
+          champMdpRepete.value = hashedMdp;
+
+          resolve(true);
+        });
+      }
+    </script>
+  </body>
+</html>

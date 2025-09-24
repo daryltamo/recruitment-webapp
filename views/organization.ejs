@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang='fr'>
+    
+<head>
+    <meta charset='utf-8'>
+    <title>MT Rec - Organisation</title>
+    <link rel='stylesheet' href='/stylesheets/accueil.css'>
+    <link rel='stylesheet' href='/stylesheets/formulaires.css'>
+    
+    <!-- 
+    <link rel='stylesheet' href='/stylesheets/connexion.css'>
+    <link rel='stylesheet' href='/stylesheets/general.css'>
+    -->
+</head>
+
+<body>
+
+    <header>
+        <div class='container'>
+            <div class='logo'>
+                <img src='/images/mt-logo.png' alt='Logo' class='logo'>
+            </div>
+        
+            <nav>
+                <a href='#'>Link 1</a>
+                <a href='#'>link 2</a>
+                <a href='#'>link 3</a>
+                <a href='#'>link 4</a>
+                <a href='/connexion/disconnectUser' class='deconnexion'>Deconnexion</a>
+            </nav>
+        </div>
+        <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </header>
+
+
+    <main class='content'>
+        <div>
+
+            <div class='disposition_verticale'>
+
+                <div class='tableau'>
+
+                    <div class='titre-tableau'>
+                        <h3> <%= title %> </h3>
+                    </div>
+                    
+                    <table border>
+
+                        <thead>
+                            <tr>
+                                <th>siren</th>
+                                <th>Nom</th>
+                                <th>Siege Social</th>
+                                <th>Type Assos</th> 
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% organisations.forEach((org)=> { %>
+                                <tr>
+                                    <td>
+                                        <%= org.siren %>
+                                    </td>
+                                    <td>
+                                        <%= org.nom %>
+                                    </td>
+                                    <td>
+                                        <%= org.hqOrg %>
+                                    </td>
+                                    <td>
+                                        <%= org.type_assos %>
+                                    </td>
+                                </tr>
+                            <% } ) %>
+                        </tbody>
+
+                    </table>
+                    
+                </div>
+
+                <div class='formulaire'>
+
+                    <div class='titre-formulaire'>
+                        <h3>Formulaire de demande de création d'une organisation</h3>
+                    </div>
+                    
+                    <form action='/organisation/addOrganisation' method='post' id='organisationCreationRequestForm'>
+                        <label for='Siren de l\'organisation'>Siren de l\'organisation:</label>
+                        <input type='text' id='sirenOrg' name='sirenOrg' required><br>
+                        
+                        <label for='Nom del\'organisation'>Nom del\'organisation:</label>
+                        <input type='text' id='nameOrg' name='nameOrg' required><br>
+                        
+                        <label for='Siège social'>Siège social:</label>
+                        <input type='text' id='hqOrg' name='hqOrg' required><br>
+                        
+                        <label for='Type d'association'>Type d'association:</label>
+                        <input type='text' id='type_assos' name='type_assos' required><br>
+                        
+                        <input type='submit' value='Soumettre'>
+                        <input type='reset' value='Effacer'>
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+
+    <footer>
+        <div class='container'>
+            <div class='logo'>
+                <img src='/images/mt-logo.png' alt='Logo' class='logo'>
+            </div>
+
+            <div class='disposition_verticale'>
+                
+                <div class='disposition_horizontale'>
+                    <a href='#'>A propos de nous</a>
+                    <a href='#'>Nous contacter</a>
+                </div>
+
+                <div class='copyright'>
+                    <p>Copyright - MT Rec 2024©</p>
+                </div>
+
+            </div>
+            
+        </div>
+        <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    
+    </footer>
+
+
+    <script>
+        document.getElementById('organisationCreationRequestForm').addEventListener('submit', function (event) {
+            event.preventDefault();  // Empêcher la soumission normale du formulaire
+
+            // Récupérer les valeurs du formulaire
+            var formData = {
+                sirenOrg: document.getElementById('sirenOrg').value,
+                nameOrg: document.getElementById('nameOrg').value,
+                prenom: document.getElementById('hqOrg').value,
+                type_assos: document.getElementById('type_assos').value,
+            };
+
+            // Envoi des données du formulaire en utilisant fetch API
+            fetch('/organisation/addorg', {
+                method: 'POST',
+                headers: {
+                    'content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    alert('organisation enregistree avec succès!');
+                    window.location.href = '/organisation';
+
+                })
+                .catch((error) => {
+                    console.log('Error:', error);
+                    alert('Erreur lors de l\'enregistrement de l\'organisation.');
+                });
+        });
+    </script>
+    
+</body>
+
+
+
+</html>
+

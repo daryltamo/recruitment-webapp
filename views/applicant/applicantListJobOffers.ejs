@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>MT Rec - Offres d'emploi</title>
+    <link rel="stylesheet" href="/stylesheets/accueil.css" />
+
+    <!--
+    <link rel='stylesheet' href='/stylesheets/connexion.css'>
+    <link rel='stylesheet' href='/stylesheets/formulaires.css'>
+    <link rel='stylesheet' href='/stylesheets/general.css'>
+    -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+  </head>
+
+  <body>
+    <header>
+      <div class="container">
+        <div class="logo">
+          <a href="/candidat/accueilCandidat"
+            ><img src="/images/mt-logo.png" alt="Accueil" class="logo"
+          /></a>
+        </div>
+
+        <nav>
+          <a href="/candidat/listeOffres">Liste des offres</a>
+          <a href="/candidat/gestionDesCandidaturesCandidat"
+            >Gérer mes candidatures</a
+          >
+          <a href="/candidat/devenirRecruteur">Devenir recruteur</a>
+          <a href="/candidat/devenirAdmin">DevenirAdmin</a>
+          <a href="/candidat/monCompteCandidat">Mon compte</a>
+          <a href="/connexion/disconnectUser" class="deconnexion"
+            >Deconnexion</a
+          >
+        </nav>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </header>
+
+    <main class="content">
+      <div>
+        <div class="disposition_verticale">
+          <h2><%= title %></h2>
+          <table border>
+            <thead>
+              <tr>
+                <th>Numero de l'offre</th>
+                <th>Recruteur</th>
+                <th>Indication</th>
+                <th>Documents requis</th>
+                <th>Date de fin de validité</th>
+                <th>Etat</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% offers.forEach((offer)=> { %>
+              <tr>
+                <td><%= offer.num %></td>
+                <td><%= offer.idRecruiter %></td>
+                <td><%= offer.indication %></td>
+                <td><%= offer.numberOfRequiredDocuments %></td>
+                <td><%= offer.expirationDate %></td>
+                <td><%= offer.state %></td>
+
+                <td>
+                  <button
+                    class="btn btn-outline btn-warning"
+                    onclick="viewOffer("
+                    <%="offer.num"
+                    %
+                  >
+                    ')'>Consulter
+                  </button>
+                </td>
+                <td>
+                  <button
+                    class="btn btn-outline btn-success"
+                    onclick="applyToOffer("
+                    <%="offer.num"
+                    %
+                  >
+                    ')'>Candidater
+                  </button>
+                </td>
+              </tr>
+              <% } ) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="logo">
+          <img src="/images/mt-logo.png" alt="Logo" class="logo" />
+        </div>
+
+        <div class="disposition_verticale">
+          <div class="disposition_horizontale">
+            <a href="#">A propos de nous</a>
+            <a href="#">Nous contacter</a>
+          </div>
+
+          <div class="copyright">
+            <p>Copyright - MT Rec 2024©</p>
+          </div>
+        </div>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </footer>
+
+    <script>
+      function viewOffer(num) {
+          console.log('Redirection vers la page de consultation de l'offre: /candidat/detailOffreCandidat?offerNumber=' + num);
+          window.location.href = '/candidat/detailOffreCandidat/' + num;
+      }
+
+      function applyToOffer(num) {
+          console.log('Redirection vers la page de consultation de l'offre: /candidat/candidatureAUneoffre?offerNumber=' + num);
+          window.location.href = '/candidat/candidatureAUneoffre/' + num;
+      }
+    </script>
+  </body>
+</html>

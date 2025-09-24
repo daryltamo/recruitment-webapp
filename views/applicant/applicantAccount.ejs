@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+
+    <title>MT Rec - Mon Compte Candidat</title>
+    <link rel="stylesheet" href="/stylesheets/accueil.css" />
+    <!--
+    <link rel='stylesheet' href='/stylesheets/connexion.css'>
+    <link rel='stylesheet' href='/stylesheets/formulaires.css'>
+    <link rel='stylesheet' href='/stylesheets/general.css'>
+    TODO: use relative paths for stylesheets
+    -->
+  </head>
+
+  <body>
+    <header>
+      <div class="container">
+        <div class="logo">
+          <a href="/candidat/accueilCandidat"
+            ><img src="/images/mt-logo.png" alt="Accueil" class="logo"
+          /></a>
+        </div>
+
+        <nav>
+          <!-- <a href='/candidat/listeOffres'>Liste des offres</a> -->
+          <a href="/candidat/gestionDesCandidaturesCandidat"
+            >Gérer mes candidatures</a
+          >
+          <a href="/candidat/devenirRecruteur">Devenir recruteur</a>
+          <a href="/candidat/monCompteCandidat">Mon compte</a>
+          <a href="/connexion/disconnectUser" class="deconnexion"
+            >Deconnexion</a
+          >
+        </nav>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </header>
+
+    <main class="content">
+      <div>
+        <div class="disposition_horizontale">
+          <div class="disposition_verticale">
+            <div class="message_accueil">
+              <h2>Bienvenue sur MT Rec, <%= prenom %> <%= nom %></h2>
+            </div>
+
+            <div class="image_accueil">
+              <img
+                src="/images/landscape-man-canoe-river-freepik.jpg"
+                alt="Admin"
+                class="img_presentation"
+              />
+            </div>
+
+            <div class="message_accueil">
+              <h3>Vous êtes connecté en tant que : <%= role %></h3>
+              <h3>Votre organisation: <%= organisation %></h3>
+            </div>
+          </div>
+
+          <div class="disposition_verticale">
+            <div class="info-contact">
+              <p>
+                Pour plus d'informations, veuillez contacter nous contacter au
+                mail suivant : contact@mtrecrutement.com
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="logo">
+          <img src="/images/mt-logo.png" alt="Logo" class="logo" />
+        </div>
+
+        <div class="disposition_verticale">
+          <div class="disposition_horizontale">
+            <a href="#">A propos de nous</a>
+            <a href="#">Nous contacter</a>
+          </div>
+
+          <div class="copyright">
+            <p>Copyright - MT Rec 2024©</p>
+          </div>
+        </div>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </footer>
+  </body>
+</html>

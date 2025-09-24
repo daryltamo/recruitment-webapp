@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+
+    <title>MT Rec - Gestion des organisations</title>
+    <link rel="stylesheet" href="/stylesheets/accueil.css" />
+    <link rel="stylesheet" href="/stylesheets/formulaires.css" />
+
+    <!--
+    <link rel='stylesheet' href='/stylesheets/connexion.css'>
+    <link rel='stylesheet' href='/stylesheetsetsets/general.css'>
+    -->
+  </head>
+
+  <body>
+    <header>
+      <div class="container">
+        <div class="logo">
+          <a href="/admin/accueilAdmin"
+            ><img src="/images/mt-logo.png" alt="Accueil" class="logo"
+          /></a>
+        </div>
+
+        <nav>
+          <a href="/admin/gestionOrganisations">Gérer les organisations</a>
+          <a href="/admin/gestionUtilisateurs">Gérer les utilisateurs</a>
+          <a href="/admin/listeDemandesDevenirRecruteur"
+            >Demandes DevenirRecruteur</a
+          >
+          <a href="/admin/listeDemandesDevenirAdmin">Demandes Devenir Admin</a>
+          <a href="/admin/listeDemandesRejoindreOrg">Demandes Rejoindre Org</a>
+          <a href="/admin/listeDemandesAjoutOrg">Demandes Ajout Org</a>
+          <a href="/admin/monCompteAdmin">Mon compte</a>
+          <a href="/connexion/disconnectUser" class="deconnexion"
+            >Deconnexion</a
+          >
+        </nav>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </header>
+
+    <main class="content">
+      <div>
+        <div class="disposition_verticale">
+          <div
+            class="formulaire"
+            id="updateOrganisationForm"
+            style="display: none"
+          >
+            <div class="titre-formulaire">
+              <h3>Modifier une organisation</h3>
+            </div>
+
+            <form id="updateOrgForm" action="/organisation" method="PUT">
+              Siren:
+              <input
+                id="update_siren"
+                type="text"
+                name="siren"
+                placeholder="000111222"
+                required
+              />
+              Nom org: <input id='update_nom_org' type='text' name='nom'
+              placeholder='Nom de l\'organisation' required> Siège social:
+              <input
+                id="update_siege_social"
+                type="text"
+                name="hqOrg"
+                placeholder="Siège social"
+                required
+              />
+              Type Assos: <input id='update_type_assos' type='text'
+              name='type_assos' placeholder='Type d'association' required>
+
+              <input type="submit" value="Soumettre" />
+              <button type="button" onclick="hideUpdateForm()">Annuler</button>
+            </form>
+          </div>
+
+          <% if (organisations.length > 0) { %>
+          <div class="tableau">
+            <div class="titre-tableau">
+              <h3><%= title %></h3>
+            </div>
+
+            <table border="1">
+              <thead>
+                <th>Siren</th>
+                <th>Nom Organisation</th>
+                <th>Siège Social</th>
+                <th>Type d'Association</th>
+                <th>Actions</th>
+              </thead>
+
+              <tbody>
+                <% organisations.forEach(function(org) { %>
+                <tr>
+                  <td><%= org.siren %></td>
+                  <td><%= org.nom %></td>
+                  <td><%= org.hqOrg %></td>
+                  <td><%= org.type_assos %></td>
+                  <td>
+                    <button
+                      class="btn btn-outline btn-warning"
+                      onclick="updateOrganisation("
+                      <%="org.siren"
+                      %
+                    >
+                      ')'> Modifier
+                    </button>
+                    <button
+                      class="btn btn-outline btn-success"
+                      onclick="deleteOrganisation("
+                      <%="org.siren"
+                      %
+                    >
+                      ')'> Supprimer
+                    </button>
+                  </td>
+                </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+          <% } else { %>
+          <h3>Aucune organisation pour le moment !</h3>
+          <% } %>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="logo">
+          <img src="/images/mt-logo.png" alt="Logo" class="logo" />
+        </div>
+
+        <div class="disposition_verticale">
+          <div class="disposition_horizontale">
+            <a href="#">A propos de nous</a>
+            <a href="#">Nous contacter</a>
+          </div>
+
+          <div class="copyright">
+            <p>Copyright - MT Rec 2024©</p>
+          </div>
+        </div>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </footer>
+
+    <script>
+      function hideUpdateForm() {
+        document.getElementById("updateOrganisationForm").style.display =
+          "none";
+      }
+
+      function deleteOrganisation(siren) {
+        var confirmation = confirm(
+          "Voulez-vous vraiment supprimer cette organisation?"
+        );
+        if (confirmation) {
+          // window.location.href = '/admin/deleteOrganisation/' + siren;
+          var formData = {
+            siren: siren,
+          };
+
+          fetch("/organisation/" + siren, {
+            method: "DELETE",
+            headers: {
+              "content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log(data);
+              if (data.status === "success") {
+                alert(data.message);
+                window.location.reload();
+              }
+            })
+            .catch((error) => {
+              console.log("Error:", error);
+            });
+        }
+      }
+
+      function updateOrganisation(siren) {
+        fetch("/organisation/" + siren, {
+          method: "GET",
+          headers: {
+            "content-Type": "application/json",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data + ". - (updateOrganisation)");
+            if (data.status === "success") {
+              // save the old values
+              old_siren = data.organisation.siren; // old
+              old_nom_org = data.organisation.nom; // old
+              old_siege_social = data.organisation.hqOrg; // old hqOrg
+              old_type_assos = data.organisation.type_assos; // old
+
+              document.getElementById("update_siren").value = old_siren;
+              document.getElementById("update_nom_org").value = old_nom_org;
+              document.getElementById("update_siege_social").value =
+                old_siege_social;
+              document.getElementById("update_type_assos").value =
+                old_type_assos;
+
+              document.getElementById("updateOrganisationForm").style.display =
+                "block";
+
+              document
+                .getElementById("updateOrgForm")
+                .addEventListener("submit", function (event) {
+                  event.preventDefault();
+
+                  var formData = {
+                    siren: document.getElementById("update_siren").value,
+                    nom: document.getElementById("update_nom_org").value,
+                    hqOrg: document.getElementById("update_siege_social").value,
+                    type_assos:
+                      document.getElementById("update_type_assos").value,
+                  };
+
+                  fetch("/organisation/" + formData["siren"], {
+                    method: "PUT",
+                    headers: {
+                      "content-Type": "application/json",
+                    },
+                    body: JSON.stringify(formData),
+                  })
+                    .then((response) => response.json())
+                    .then((data) => {
+                      console.log(data);
+                      if (data.status === "success") {
+                        alert(data.message);
+                        window.location.reload();
+                      }
+                    })
+                    .catch((error) => {
+                      console.log("Error:", error);
+                    });
+                });
+            } else {
+              console.log("Erreur: " + data.message);
+            }
+          })
+          .catch((error) => {
+            console.log("Erreur:" + error);
+            alert(error.message);
+          });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>MT Rec - Gestion des utilisateurs</title>
+    <link rel="stylesheet" href="/stylesheets/accueil.css" />
+    <link rel="stylesheet" href="/stylesheets/formulaires.css" />
+
+    <!-- 
+    <link rel='stylesheet' href='/stylesheets/connexion.css'>
+    <link rel='stylesheet' href='/stylesheetsetsets/general.css'>
+    
+    <link href='https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css' rel='stylesheet' type='text/css' />
+    -->
+  </head>
+
+  <body>
+    <header>
+      <div class="container">
+        <div class="logo">
+          <img src="/images/mt-logo.png" alt="Logo" class="logo" />
+        </div>
+
+        <nav>
+          <a href="#">Link 1</a>
+          <a href="#">link 2</a>
+          <a href="#">link 3</a>
+          <a href="#">link 4</a>
+          <a href="/connexion/disconnectUser" class="deconnexion"
+            >Deconnexion</a
+          >
+        </nav>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </header>
+
+    <main class="content">
+      <div>
+        <div class="disposition_verticale">
+          <h2>Plongeons dans<br />le monde du travail</h2>
+          <h2>Les sessions fonctionnent : <%= user_name %></h2>
+          <div class="tableau">
+            <div class="titre-tableau">
+              <h3><%= title %></h3>
+            </div>
+
+            <table border>
+              <thead>
+                <tr>
+                  <th>Firstname</th>
+                  <th>Lastname</th>
+                  <th>Email</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <% users.forEach((user)=> { %>
+                <tr>
+                  <td><%= user.prenom %></td>
+                  <td><%= user.nom %></td>
+                  <td><%= user.email %></td>
+                  <td>
+                    <button
+                      class="btn btn-outline btn-warning"
+                      onclick="updateUser("
+                      <%="user.email"
+                      %
+                    >
+                      ')'> Modifier
+                    </button>
+                  </td>
+                  <td>
+                    <button
+                      class="btn btn-outline btn-success"
+                      onclick="deleteUser("
+                      <%="user.email"
+                      %
+                    >
+                      ')'> Supprimer
+                    </button>
+                  </td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="formulaire">
+            <div class="titre-formulaire">
+              <h3>Formulaire d\'ajout' d'un utilisateur</h3>
+            </div>
+
+            <form id="addUserForm" action="/users/addUser" method="post">
+              <label for="email">E-mail</label>
+              <input type="text" id="email" name="email" required /><br />
+
+              <label for="nom">Nom</label>
+              <input type="text" id="nom" name="nom" required /><br />
+
+              <label for="prenom">Prénom</label>
+              <input type="text" id="prenom" name="prenom" required /><br />
+
+              <label for="telephone">Téléphone</label>
+              <input
+                type="tel"
+                id="telephone"
+                name="telephone"
+                required
+              /><br />
+
+              <label for="password">Mot de passe</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                required
+              /><br />
+
+              <!-- <label for='mdp_repete'>Mot de passe à nouveau</label>
+                        <input type='password' id='mdp_repete' name='mdp_repete' required><br> -->
+
+              <!-- <label for='accountRegistrationDate'>Date création compte</label>
+                        <input type='date' name='accountRegistrationDate' required>-->
+
+              <input type="submit" value="Soumettre" />
+              <input type="reset" value="Effacer" />
+            </form>
+          </div>
+
+          <div
+            id="updateUtilisateurForm"
+            class="formulaire"
+            style="display: none"
+          >
+            <div class="titre-formulaire">
+              <h3>Update User Information</h3>
+            </div>
+
+            <form id="updateUserForm" action="/users/" , method="PUT">
+              Email:
+              <input
+                type="text"
+                id="update_email"
+                name="email"
+                required
+              /><br />
+              Nom:
+              <input type="text" id="update_nom" name="nom" required /><br />
+              Prénom:
+              <input
+                type="text"
+                id="update_prenom"
+                name="prenom"
+                required
+              /><br />
+              Téléphone:
+              <input
+                type="tel"
+                id="update_telephone"
+                name="telephone"
+                required
+              /><br />
+              Ancien Mdp:
+              <input
+                type="password"
+                id="old_mdp"
+                name="old_mdp"
+                required
+              /><br />
+              Nouveau Mdp:
+              <input
+                type="password"
+                id="update_mdp"
+                name="password"
+                required
+              /><br />
+              Confirmer Nouveau Mdp:
+              <input
+                type="password"
+                id="repeat_update_mdp"
+                name="mdp_repete"
+                required
+              /><br />
+              <input type="submit" value="Soumettre" />
+              <button type="button" onclick="hideUpdateForm()">Annuler</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="logo">
+          <img src="/images/mt-logo.png" alt="Logo" class="logo" />
+        </div>
+
+        <div class="disposition_verticale">
+          <div class="disposition_horizontale">
+            <a href="#">A propos de nous</a>
+            <a href="#">Nous contacter</a>
+          </div>
+
+          <div class="copyright">
+            <p>Copyright - MT Rec 2024©</p>
+          </div>
+        </div>
+      </div>
+      <!-- TODO: check footer and header consistency and uniformity accross all pages -->
+    </footer>
+
+    <script>
+      function deleteUser(email) {
+        if (confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?")) {
+          var formData = {
+            email: email,
+          };
+
+          fetch("/users/" + email, {
+            method: "DELETE",
+            headers: {
+              "content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log(data);
+              if (data.status === "success") {
+                alert(data.message);
+                window.location.reload();
+              }
+            })
+            .catch((error) => {
+              console.log("Erreur:" + error);
+              alert(error.message);
+            });
+        }
+      }
+
+      function updateUser(email) {
+        // window.location.href = '/users/' + email;
+        fetch("/users/" + email, {
+          method: "PUT",
+          headers: {
+            "content-Type": "application/json",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+            if (data.status === "success") {
+              old_email = data.user.email;
+              old_name = data.user.nom;
+              old_firstname = data.user.prenom;
+              old_phone = data.user.phoneNumber;
+              old_password = data.user.password;
+
+              document.getElementById("update_email").value = old_email;
+              document.getElementById("update_nom").value = old_name;
+              document.getElementById("update_prenom").value = old_firstname;
+              document.getElementById("update_telephone").value = old_phone;
+              // document.getElementById('update_mdp').value = old_password;
+
+              // Show the update form
+              document.getElementById("updateUtilisateurForm").style.display =
+                "block";
+            } else {
+              console.log("Erreur:" + data.message);
+            }
+          })
+          .catch((error) => {
+            console.log("Erreur:" + error);
+            alert(error.message);
+          });
+      }
+
+      // TODO: make a hidden form that appears when the update button is clicked
+      function hideUpdateForm() {
+        document.getElementById("updateUtilisateurForm").style.display = "none";
+      }
+
+      document
+        .getElementById("addUserForm")
+        .addEventListener("submit", (event) => {
+          event.preventDefault(); // prevent default form submission
+
+          // Collect form data
+          var formData = {
+            email: document.getElementById("email").value,
+            nom: document.getElementById("nom").value,
+            prenom: document.getElementById("prenom").value,
+            telephone: document.getElementById("telephone").value,
+            password: document.getElementById("password").value,
+          };
+
+          fetch("/users", {
+            method: "PUT",
+            headers: {
+              "content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log(data);
+              if (data.status === "success") {
+                alert(data.message);
+                // Cacher le formulaire de mise a jour
+                document.getElementById("updateUtilisateurForm").style.display =
+                  "none";
+
+                // Recharger la page pour refléter la modification
+                window.location.reload();
+              } else {
+                console.log("Erreur:" + data.message);
+                alert(data.message);
+              }
+            })
+            .catch((error) => {
+              console.log("Erreur:" + error);
+              alert("An error occurred while updating the user.");
+            });
+        });
+
+      document
+        .getElementById("updateUserForm")
+        .addEventListener("submit", (event) => {
+          event.preventDefault(); // prevent default form submission
+
+          // Collect form data
+          var formData = {
+            email: document.getElementById("update_email").value,
+            nom: document.getElementById("update_nom").value,
+            prenom: document.getElementById("update_prenom").value,
+            telephone: document.getElementById("update_telephone").value,
+            password: document.getElementById("update_mdp").value,
+          };
+
+          fetch("/users", {
+            method: "PUT",
+            headers: {
+              "content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log(data);
+              if (data.status === "success") {
+                alert(data.message);
+                // Cacher le formulaire de mise a jour
+                document.getElementById("updateUtilisateurForm").style.display =
+                  "none";
+
+                // Recharger la page pour refléter la modification
+                window.location.reload();
+              } else {
+                console.log("Erreur:" + data.message);
+                alert(data.message);
+              }
+            })
+            .catch((error) => {
+              console.log("Erreur:" + error);
+              alert("An error occurred while updating the user.");
+            });
+        });
+    </script>
+  </body>
+</html>
