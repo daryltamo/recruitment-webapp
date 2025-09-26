@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   web:
-    image: ghcr.io/OWNER/REPO:latest
+    image: ghcr.io/daryltamo/recruitment-webapp:latest
     env_file: .env
     restart: always
     ports:
