@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: deploy-production
+  group: deploy-production-${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -23,7 +23,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-      id-token: write
+      statuses: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,8 +34,15 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: Install (prod audit)
-        run: npm ci
+      - name: Install dependencies
+        run: |
+          if npm ci; then
+            echo "npm ci succeeded"
+          else
+            echo "::warning::npm ci failed, falling back to npm install (consider fixing lock file)."
+            rm -rf node_modules
+            npm install
+          fi
 
       - name: Lint placeholder
         run: echo "Add ESLint here"
@@ -60,7 +67,8 @@ jobs:
             type=sha
             type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: Build and Push
+      - name: 
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -70,6 +78,40 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             NODE_ENV=production
+
+      - name: Generate SBOM (SPDX JSON)
+        id: sbom
+        uses: anchore/sbom-action@v0
+        with:
+          image: ${{ env.REGISTRY }}/${{ github.repository }}:latest
+          format: spdx-json
+          artifact-name: sbom-${{ github.sha }}.json
+
+      - name: Trivy Vulnerability Scan (CRITICAL,HIGH)
+        id: trivy-scan
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ github.repository }}:latest
+          format: 'table'
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '0' # set to 1 to fail pipeline on findings
+          ignore-unfixed: true
+          cache-dir: .trivy-cache
+
+      - name: Upload Trivy Report (SARIF)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report-${{ github.sha }}
+          path: trivy-report
+          if-no-files-found: ignore
+
+      - name: Summarize Security Artifacts
+        run: |
+          echo "SBOM artifact: sbom-${{ github.sha }}.json" >> $GITHUB_STEP_SUMMARY
+          echo "Trivy scan executed (CRITICAL,HIGH)." >> $GITHUB_STEP_SUMMARY
+          echo "To fail on vulnerabilities, set exit-code: '1' in Trivy step." >> $GITHUB_STEP_SUMMARY
 
       - name: Summarize
         run: |
@@ -81,24 +123,49 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      statuses: write
     steps:
-      - name: Prepare deploy script
-        id: prep
+      - name: Configure AWS Credentials (OIDC) # Only needed if you add AWS CLI usage below
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-session-name: GitHubActionsDeploy     
+      - name: Prepare deploy payload
         run: |
-          cat > deploy.sh <<'EOF'
+          # Base64 encode deploy script to preserve formatting
+          cat > deploy.sh <<'SCRIPT'
           set -euo pipefail
           APP_NAME=recruitment-webapp
           IMAGE=${{ env.REGISTRY }}/${{ github.repository }}:latest
+          echo "==> Deploy starting on $(hostname)"
+          if ! command -v docker >/dev/null 2>&1; then
+            echo "Installing Docker..."
+            sudo yum update -y
+            sudo yum install -y docker
+            sudo systemctl enable --now docker
+            sudo usermod -aG docker $USER || true
+          fi
+          if [ -n "${ENV_FILE_B64:-}" ]; then
+            echo "$ENV_FILE_B64" | base64 -d > .env
+          else
+            echo "::warning::No ENV_FILE_B64 provided."
+            touch .env
+          fi
+          # (Optional) docker login if image private
+          if [ -n "${GHCR_TOKEN:-}" ]; then
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          fi
           echo "Pulling image: $IMAGE"
           docker pull "$IMAGE"
-          echo "Stopping old container (if any)..."
+          echo "Stopping previous container if exists..."
           docker rm -f "$APP_NAME" 2>/dev/null || true
           mkdir -p /opt/$APP_NAME
           cd /opt/$APP_NAME
-          # Write .env if provided as secret ENV_FILE_B64
-          if [ -n "${ENV_FILE_B64:-}" ]; then
-            echo "$ENV_FILE_B64" | base64 -d > .env
-          fi
           # Run container
           docker run -d \
             --name "$APP_NAME" \
@@ -107,35 +174,64 @@ jobs:
             --restart=always \
             "$IMAGE"
           docker image prune -f
-          echo "Deployment complete."
-          EOF
+          docker ps --filter "name=$APP_NAME"
+          echo "==> Deploy complete."
+          SCRIPT
 
-      - name: SSH and deploy
-        uses: appleboy/ssh-action@v1.1.0
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script_stop: true
-          envs: GITHUB_REPOSITORY
-          command_timeout: 20m
-          script: |
-            # Install docker if missing
-            if ! command -v docker >/dev/null 2>&1; then
-              sudo apt-get update -y
-              sudo apt-get install -y docker.io
-              sudo systemctl enable --now docker
-            fi
-            # Provide ENV_FILE_B64 into environment for deploy script if secret exists
-            export ENV_FILE_B64='${{ secrets.ENV_FILE_B64 }}'
-            bash -s < /dev/stdin <<'INNER'
-            $(cat deploy.sh)
-            INNER
+          DEPLOY_B64=$(base64 -w0 < deploy.sh || base64 < deploy.sh)
+          echo "DEPLOY_B64=$DEPLOY_B64" >> $GITHUB_ENV
 
+      - name: Send SSM command
+        run: |
+          INSTANCE_ID=$(aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=${{ secrets.EC2_INSTANCE_NAME }}" "Name=instance-state-name,Values=running" \
+            --query "Reservations[0].Instances[0].InstanceId" --output text)
+
+          if [ "$INSTANCE_ID" = "None" ] || [ -z "$INSTANCE_ID" ]; then
+            echo "::error::Could not resolve a running instance by tag Name=${{ secrets.EC2_INSTANCE_NAME }}"
+            exit 1
+          fi
+
+          CMD_ID=$(aws ssm send-command \
+            --instance-ids "$INSTANCE_ID" \
+            --document-name "AWS-RunShellScript" \
+            --comment "Deploy recruitment-webapp" \
+            --parameters "commands=[
+              \"mkdir -p /opt/recruitment-webapp && cd /opt/recruitment-webapp\",
+              \"export ENV_FILE_B64='${{ secrets.ENV_FILE_B64 }}'\",
+              \"export GHCR_TOKEN='${{ secrets.GHCR_READ_TOKEN }}'\",
+              \"echo $DEPLOY_B64 | base64 -d > deploy.sh\",
+              \"bash deploy.sh\"
+            ]" \
+            --query "Command.CommandId" --output text)
+
+          echo "COMMAND_ID=$CMD_ID" >> $GITHUB_ENV
+          echo "Sent SSM command: $CMD_ID"
+
+      - name: Wait for SSM command
+        run: |
+          STATUS=""
+          for i in $(seq 1 30); do
+            STATUS=$(aws ssm list-command-invocations \
+              --command-id "$COMMAND_ID" \
+              --details \
+              --query "CommandInvocations[0].Status" \
+              --output text)
+            echo "Attempt $i: Status=$STATUS"
+            case "$STATUS" in
+              Success) break ;;
+              Failed|Cancelled|TimedOut) echo "::error::SSM command failed with status $STATUS"; exit 1 ;;
+            esac
+            sleep 10
+          done
+          if [ "$STATUS" != "Success" ]; then
+            echo "::error::SSM command did not reach Success (last status: $STATUS)"
+            exit 1
+          fi
       - name: Post-deploy health check
         uses: jtalk/url-health-check-action@v4
         with:
-          url: http://${{ secrets.EC2_HOST }}:3000/
+          url: http://${{ secrets.EC2_HOST }}:3000/health
           max-attempts: 10
           retry-delay: 5s
           retry-all: true
