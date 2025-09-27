@@ -1,16 +1,16 @@
 #!/bin/bash
 
 # Update the package repository
-apt-get update -y
+sudo yum update -y
 
 # Install Node.js and npm
-apt-get install -y nodejs npm
+sudo yum install -y nodejs npm
 
 # Install Docker
-apt-get install -y docker.io
+sudo yum install -y docker
 
 # Install Docker Compose
-apt-get install -y docker-compose
+sudo yum install -y docker-compose
 
 # Clone the application repository (replace with your repository URL)
 git clone https://github.com/yourusername/recruitment-webapp.git /home/ubuntu/recruitment-webapp
@@ -25,5 +25,4 @@ npm install
 docker-compose up -d
 
 # Clean up
-apt-get clean
-rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+sudo yum clean all
