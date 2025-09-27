@@ -15,20 +15,20 @@ This document provides instructions for deploying the Recruitment Web App on an 
 1. **Connect to Your EC2 Instance**:
    Use SSH to connect to your EC2 instance:
    ```
-   ssh -i your-key.pem ubuntu@your-ec2-public-dns
+   ssh -i your-key.pem ec2-user@your-ec2-public-dns
    ```
 
 2. **Install Node.js and npm**:
    Update the package index and install Node.js and npm:
    ```
-   sudo apt update
-   sudo apt install -y nodejs npm
+   sudo yum update
+   sudo yum install -y nodejs npm
    ```
 
 3. **Install Docker**:
    Follow these commands to install Docker:
    ```
-   sudo apt install -y docker.io
+   sudo yum install -y docker
    sudo systemctl start docker
    sudo systemctl enable docker
    ```
@@ -41,6 +41,16 @@ This document provides instructions for deploying the Recruitment Web App on an 
    ```
 
 5. **Build the Docker Image**:
+   First make sure to add your user to the docker group:
+   ```
+   sudo usermod -aG docker ec2-user
+   ```
+
+   And re‑load group membership (either re-login or):
+   ```
+   newgrp docker
+   ```
+
    Build the Docker image using the provided Dockerfile:
    ```
    sudo docker build -t recruitment-webapp .
