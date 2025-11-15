@@ -1,10 +1,12 @@
 name: recruitment-webapp-ci-cd
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+  # Temporarily disabled automatic triggers for testing purposes - uncomment to re-enable
+  # push:
+  #   branches: [main]
+  # pull_request:
+  #   branches: [main]
+  # Manual trigger only for now
   workflow_dispatch:
 
 concurrency:
